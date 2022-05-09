@@ -1,0 +1,28 @@
+# Playbooks to log into an always on Cisco XE IOS devices.
+# The devices is on Cisco's DevNet Sandbox
+# URL https://devnetsandbox.cisco.com/RM/Diagram/Index/7b4d4209-a17c-4bc3-9b38-f15184e53a94?diagramType=Topology
+# CSR1000v Host: sandbox-iosxe-latest-1.cisco.com
+# SSH Port: 22
+# NETCONF Port: 830
+# gRPC Telemetry Port: 57500
+# RESTCONF Port: 443 (HTTPS)
+# Username: developer
+# Password: C1sco12345
+---
+- name:  My first playbook
+  hosts: cisco
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "OSPF CONFIG"
+      cisco.ios.ios_config:
+        lines:
+          - router-id 33.44.88.22
+        parents:
+          - router ospf 19
+      register: my_output
+
+    - debug: var=my_output
+
+
