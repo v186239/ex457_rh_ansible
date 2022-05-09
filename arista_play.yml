@@ -1,0 +1,45 @@
+# ansible-playbook nxos_genie_show_comm
+# You can use many show commands listed on GENIE https://developer.cisco.com/docs/genie-docs/
+# Build a list of commands needed.  Then setup a loop to iterate over the commands for pre/post validation.
+---
+- name: Arista EOS Playbook to run show commands
+  hosts: arista
+  gather_facts: false
+  vars_prompt:
+    - name: username
+      prompt: "Enter username ?"
+      private: no
+    - name: password
+      prompt: "Enter password ?"
+    - name: command
+      prompt: Enter a Arista EOS show command
+      private: no
+  vars:
+     ansible_user: "{{ username }}"
+     ansible_ssh_pass: "{{ password }}"
+     ansible_password: "{{ password }}"
+
+  vars:
+    #  command: show lldp neighbors | json
+
+  tasks:
+    - name: Executing an Arista show command
+      arista.eos.eos_command:
+        commands: "{{ command }}"
+      register: output
+
+    - name: debug
+      ansible.builtin.debug:
+        msg: "output"
+
+    - name: Set fact for the output of the show command
+      ansible.builtin.set_fact:
+        output_struct: "{{ output.stdout[0] }}"
+
+    - name: Display Output Structured Data
+      ansible.builtin.debug:
+        msg:
+          - "-------------------"
+          - "{{ inventory_hostname }}:"
+          - "{{ output_struct }}"
+          - "-------------------"
