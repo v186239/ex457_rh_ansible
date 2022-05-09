@@ -6,18 +6,9 @@
   hosts: arista
   gather_facts: false
   vars_prompt:
-    - name: username
-      prompt: "Enter username ?"
-      private: no
-    - name: password
-      prompt: "Enter password ?"
     - name: command
       prompt: Enter a Arista EOS show command
       private: no
-  vars:
-     ansible_user: "{{ username }}"
-     ansible_ssh_pass: "{{ password }}"
-     ansible_password: "{{ password }}"
 
   vars:
     #  command: show lldp neighbors | json
