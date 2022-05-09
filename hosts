@@ -7,8 +7,14 @@ localhost ansible_connection=local
 
 [arista]
 switch ansible_host=10.199.199.10
-R1  ansible_host=10.199.199.11
-R2  ansible_host=10.199.199.12
+R1 ansible_host=10.199.199.11
+R2 ansible_host=10.199.199.12
 
 [arista:vars]
 ansible_network_os=eos
+
+[north]
+R1 ansible_host=10.199.199.11
+
+[south]
+R1 ansible_host=10.199.199.11
