@@ -62,3 +62,19 @@ If the module is not listed in the collection you can install with:
 
 ansible-galaxy collection install cisco.ios
 
+# Variables
+
+Ansible is running python under the hood.  
+
+Concept of a variable or var is a value that can change through out the exectution of a program.
+
+Example:  a username
+name:  {{ name }}  <--Variable memory location holding data
+
+Ansible can define host or group variables
+
+host variables are unique to the host like an ip address
+
+group variables apply to a group of hosts in the inventory
+
+
