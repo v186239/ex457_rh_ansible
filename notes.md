@@ -50,6 +50,7 @@ Cisco IOS Modules
 https://docs.ansible.com/ansible/latest/collections/cisco/ios/
 
 Module:  cisco.ios.{{name of module}}:
+
          cisco.ios.ios_banner:
 
 Before you can use a module you want to make sure you have the collection by
