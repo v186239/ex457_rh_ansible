@@ -15,14 +15,24 @@
   connection: network_cli
 
   tasks:
-    - name: "OSPF CONFIG"
-      cisco.ios.ios_config:
-        lines:
-          - router-id 33.44.88.22
-        parents:
-          - router ospf 19
-      register: my_output
+    # - name: "OSPF CONFIG"
+    #   cisco.ios.ios_config:
+    #     lines:
+    #       - router-id 33.44.88.22
+    #     parents:
+    #       - router ospf 19
+    #   register: my_output
 
-    - debug: var=my_output
+    # - debug: var=my_output
+    
+    - name: run show version on remote devices
+      ios_command:
+        commands: 
+          - show version | include uptime
+          - show ip interface brief
+      register: show_output
+
+    - debug: var=show_output
+
 
 

@@ -13,10 +13,11 @@ R2 ansible_host=10.199.199.12
 [arista:vars]
 ansible_network_os=eos
 
-[north]
-R1 ansible_host=10.199.199.11
+[uk]
+sandbox-iosxe-latest-1.cisco.com
 
-[south]
+[usa]
+R1 ansible_host=10.199.199.11
 R2 ansible_host=10.199.199.12
 
 [cisco]
