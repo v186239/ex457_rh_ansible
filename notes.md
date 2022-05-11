@@ -41,6 +41,7 @@ An Ansible ad hoc command uses the /usr/bin/ansible command-line tool to automat
 https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
 
 On network devices we can use the raw module to run ad-hoc commands.
+
 ansible usa -m raw -c paramiko -a "show ip interface brief"
 
 # Playbooks
