@@ -1,0 +1,10 @@
+---
+
+- name: "Printing some var info"
+  hosts: arista
+  gather_facts: no 
+
+  tasks:
+    - name: "Parse var stuff"
+      debug:
+        msg: "{{ hostvars['R1'].ospf.rid }}"
