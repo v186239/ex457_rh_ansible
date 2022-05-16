@@ -95,3 +95,107 @@ Order of operations -
 
 By default Ansible merges groups at the same parent/child level in "ASCII" order, and the last group loaded overwrites the previous groups. For example, an a_group will be merged with b_group and b_group vars that match will overwrite the ones in a_group.
 
+# Accessing Data using Variables
+
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#referencing-nested-variables
+
+Many registered variables (and facts) are nested YAML or JSON data structures. You cannot access values from these nested data structures with the simple {{ foo }} syntax. You must use either bracket notation or dot notation.
+
+For example, to reference an IP address from your facts using the bracket notation:
+
+{{ ansible_facts["eth0"]["ipv4"]["address"] }}
+
+To reference an IP address from your facts using the dot notation:
+
+{{ ansible_facts.eth0.ipv4.address }}
+
+# Defining Playbook Variables
+
+Define variables directly in ansible playbook.
+
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#defining-variables-in-a-play
+
+You can define variables directly in a playbook play:
+
+- hosts: webservers
+  vars:
+    http_port: 80
+
+When you define variables in a play, they are only visible to tasks executed in that play.
+
+Defining variables in included files and roles
+You can define variables in reusable variables files and/or in reusable roles. When you define variables in reusable variable files, the sensitive variables are separated from playbooks. This separation enables you to store your playbooks in a source control software and even share the playbooks, without the risk of exposing passwords or other sensitive and personal data. For information about creating reusable files and roles, see Re-using Ansible artifacts.
+
+This example shows how you can include variables defined in an external file:
+
+---
+
+- hosts: all
+  remote_user: root
+  vars:
+    favcolor: blue
+  vars_files:
+    - /vars/external_vars.yml
+
+  tasks:
+
+  - name: This is just a placeholder
+    ansible.builtin.command: /bin/echo foo
+
+# Understanding Loops
+
+Used Perform repetitive tasks.
+
+Examples:  
+
+Configuration needed on multiple interfaces
+ip ospf 1 area 0 
+
+Configuring multiple NTP servers
+ntp-server [ variable ip ]
+
+Two types of loops
+
+For loop 
+While loop
+
+Ansible Loop module documentation
+
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html
+
+Ansible offers the loop, with_<lookup>, and until keywords to execute a task multiple times.
+
+Example:  Loop over a list using item special key word
+
+---
+
+- name: "NTP CONFIG PLAYBOOK"
+  hosts: cisco
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Loop through NTP servers and configure"
+      vars:
+        myservers:
+          - "1.1.1.1"
+          - "2.2.2.2"
+          - "3.3.3.3"
+          - "4.4.4.4"
+      cisco.ios.ios_ntp_global:
+        config:
+          peers:
+              - peer: "{{ item }}"
+                version: 2
+      loop: "{{ myservers }}"
+
+
+
+
+
+
+
+
+
+
+
