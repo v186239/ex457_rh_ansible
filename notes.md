@@ -1,5 +1,9 @@
 # EX457 Red Hat Ansible Network Automaiton Exam Notes:
 
+# DOWNLOAD THE CODE:
+https:bit.ly/3ERJcCJ
+https://github.com/IPvZero/CodeSamples/tree/main/Ansible/
+
 # Install Ansible
 
 pip install ansible
@@ -144,6 +148,8 @@ This example shows how you can include variables defined in an external file:
 
 # Understanding Loops
 
+https://github.com/IPvZero/CodeSamples/tree/main/Ansible/Vars_Loops
+
 Used Perform repetitive tasks.
 
 Examples:  
@@ -189,6 +195,22 @@ Example:  Loop over a list using item special key word
                 version: 2
       loop: "{{ myservers }}"
 
+Looping through configured interfaces
+
+---
+
+- name: "Loop test"
+  hosts: usa
+  gather_facts: true
+  connection: network_cli
+
+  tasks:
+    - name: "Loop through IP info"
+      debug:
+        msg: "{{ ansible_net_hostname }} has an IP address {{ item }} configured"
+      loop: "{{ ansible_net_all_ipv4_addresses }}"
+
+# Conditional Logic & Filtering
 
 
 
