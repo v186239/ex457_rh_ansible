@@ -10,4 +10,5 @@
       debug:
         msg: "Interface {{ item['key'] }} has an ip address of {{ item['value']['ipv4']['address'] }}" 
       loop: "{{ ansible_net_interfaces | dict2items }}"
-      when: item['value']['type'] == "routed"
+      # when: item['value']['type'] == "routed"
+      when: item['value']['ipv4'] != {}
