@@ -252,10 +252,23 @@ tasks:
 
 Writing a Conditional Playbook:
 
-Transforming dictionaries into lists
+Transforming dictionaries into lists | dict2items }}"
+
 https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#transforming-dictionaries-into-lists
 
+---
 
+- name:  "Playbook to test conditional logic"
+  hosts: usa
+  gather_facts: true
+  connection: network_cli
+
+  tasks:
+    - name: "Task 1 print out facts"
+      debug:
+        msg: "Interface {{ item['key'] }} has an ip address of {{ item['value']['ipv4']['address'] }}" 
+      loop: "{{ ansible_net_interfaces | dict2items }}"
+      when: item['value']['type'] == "routed"
 
 
 
