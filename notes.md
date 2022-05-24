@@ -212,6 +212,53 @@ Looping through configured interfaces
 
 # Conditional Logic & Filtering
 
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html
+
+What is Conditional Logic?
+
+"If" a condition is met "then" something can happen.
+
+"If" a condition is not met "Else" can happen.
+
+The When Keywork:
+
+Basic conditionals with when keyword
+
+The when clause is a raw Jinja2 expression without double curly braces (see group_by_module).
+
+Logical Operators:
+
+"And" logic both conditions have to be true
+
+"Or" logic in at least one of the statements must be true
+
+Example using multiple conditions using Logical Operators with Parantheses:
+
+tasks:
+  - name: Shut down CentOS 6 and Debian 7 systems
+    ansible.builtin.command: /sbin/shutdown -t now
+    when: (ansible_facts['distribution'] == "CentOS" and ansible_facts['distribution_major_version'] == "6") or
+          (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "7")
+
+
+Using a list a Logical "And" Operator is implied:  All conditions must be met to true.
+
+tasks:
+  - name: Shut down CentOS 6 systems
+    ansible.builtin.command: /sbin/shutdown -t now
+    when:
+      - ansible_facts['distribution'] == "CentOS"
+      - ansible_facts['distribution_major_version'] == "6"
+
+Writing a Conditional Playbook:
+
+Transforming dictionaries into lists
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#transforming-dictionaries-into-lists
+
+
+
+
+
 
 
 
