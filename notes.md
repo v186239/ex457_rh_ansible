@@ -270,7 +270,7 @@ https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#transf
       loop: "{{ ansible_net_interfaces | dict2items }}"
       when: item['value']['type'] == "routed"
       or
-      when: item['value']['ipv4'] != {} <--IPv4 is not an empty disctionary
+      when: item['value']['ipv4'] != {} <--IPv4 is not an empty dictionary
 
 
 
