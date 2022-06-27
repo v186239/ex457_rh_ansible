@@ -23,5 +23,5 @@
         # msg: "{{ myip | ipv4 }}"
         # msg: "{{ myip | ipv6 }}"
         # msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr('address') }}"
-         msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr('network') }}"
-        #  msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr }}"
+        #  msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr('network') }}"
+         msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr }}"
