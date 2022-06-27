@@ -1,3 +1,6 @@
+# The IP address filter can be used to validate IPv4 and IPv6 addresses
+# The IP address fileter can also be used to find the network address of a subnet.
+# To install the IP address filter run the "pip3.8 install netaddr"
 ---
 
 - name: "IP Filter Test"
@@ -19,4 +22,6 @@
         # msg: "{{ myip | ipaddr }}"
         # msg: "{{ myip | ipv4 }}"
         # msg: "{{ myip | ipv6 }}"
-        msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr }}"
+        # msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr('address') }}"
+         msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr('network') }}"
+        #  msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr }}"
