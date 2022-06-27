@@ -1,0 +1,17 @@
+---
+
+- name: "Filter Test"
+  hosts: "localhost"
+
+  tasks:
+    - name: " Testing some filter stuff"
+      vars:
+        usa_prefixes_list:
+          - "192.168.0.0/24"
+          - "10.0.0.0/30"
+          - "1.1.1.1/32"
+        uk_prefixes_list:
+          - "192.168.0.0/24"
+          - "10.0.0.0/30"
+      debug:
+        msg: "Difference between two lists is {{ usa_prefixes_list | symmetric_difference(uk_prefixes_list) }}" 

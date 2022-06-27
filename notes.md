@@ -272,6 +272,109 @@ https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#transf
       or
       when: item['value']['ipv4'] != {} <--IPv4 is not an empty dictionary
 
+Ansible Filters
+
+https://docs.ansible.com/ansible/2.3/playbooks_filters.html
+
+Filters are going to allow us to filter or transform our data.
+
+Filters for Formatting Data
+
+https://docs.ansible.com/ansible/2.3/playbooks_filters.html#filters-for-formatting-data
+
+The following filters will take a data structure in a template and render it in a slightly different format. These are occasionally useful for debugging:
+
+{{ some_variable | to_json }}
+{{ some_variable | to_yaml }}
+For human readable output, you can use:
+
+{{ some_variable | to_nice_json }}
+{{ some_variable | to_nice_yaml }}
+It’s also possible to change the indentation of both (new in version 2.2):
+
+{{ some_variable | to_nice_json(indent=2) }}
+{{ some_variable | to_nice_yaml(indent=8) }}
+Alternatively, you may be reading in some already formatted data:
+
+{{ some_variable | from_json }}
+{{ some_variable | from_yaml }}
+for example:
+
+tasks:
+  - shell: cat /some/path/to/file.json
+    register: result
+
+  - set_fact: myvar="{{ result.stdout | from_json }}"
+
+List Filters
+These filters all operate on list variables.
+
+New in version 1.8.
+
+To get the minimum value from list of numbers:
+
+{{ list1 | min }}
+To get the maximum value from a list of numbers:
+
+{{ [3, 4, 2] | max }}
+
+Symetric Difference filter
+---
+
+- name: "Filter Test"
+  hosts: "localhost"
+
+  tasks:
+    - name: " Testing some filter stuff"
+      vars:
+        usa_prefixes_list:
+          - "192.168.0.0/24"
+          - "10.0.0.0/30"
+          - "1.1.1.1/32"
+        uk_prefixes_list:
+          - "192.168.0.0/24"
+          - "10.0.0.0/30"
+      debug:
+        msg: "Difference between two lists is {{ usa_prefixes_list | symmetric_difference(uk_prefixes_list) }}" 
+
+JSON Query Filter 
+
+https://docs.ansible.com/ansible/2.3/playbooks_filters.html#json-query-filter
+
+IP Filters - requires a pip library called netaddr
+
+https://docs.ansible.com/ansible/2.3/playbooks_filters.html#ip-address-filter
+
+pip install netaddr
+
+or 
+
+pip3 install netaddr
+
+---
+
+- name: "IP Filter Test"
+  hosts: "localhost"
+  
+  tasks:
+    - name:  "IP addr filter sto validate an IP address"
+      vars:
+        #myip: "192.168.55.1"
+        #myip: "2001:db8:abcd::1"
+        myip:
+          - "192.168.1.1"
+          - "10.0.0.1"
+          - "10.0.0.0.1"
+          - "2001:db8:aaaa:bbbb::2"
+          - "192.168.333.1"
+          - "8.8.8.8"
+      debug:
+        #msg: "{{ myip | ipaddr }}"
+        #msg: "{{ myip | ipv4 }}"
+        #msg: "{{ myip | ipv6 }}"
+        msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr }}"
+
+
 
 
 

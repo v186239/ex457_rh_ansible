@@ -1,0 +1,17 @@
+---
+
+- name: "Filter Test"
+  hosts: "localhost"
+
+  tasks:
+    - name: " Testing some filter stuff"
+      vars:
+        mylist:
+          - 5
+          - 10
+          - 4
+          - 44
+          - 21
+      debug:
+        # msg: "Print out the highest value in my list {{ mylist | max }}" 
+        msg: "Print out the lowest value in my list {{ mylist | min }}" 
