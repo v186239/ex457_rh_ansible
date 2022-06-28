@@ -397,7 +397,10 @@ https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_config_module
 mkdir templates
 create a jinja2 file called bgp.j2
 
-Because you created a templates directory ansible will automatically look in the templates directory for j2 files
+Because you created a templates directory ansible will automatically look in the templates directory for j2 files.
+
+You can also specify a relative path for the j2 files.  
+Example: src: /root/ex457_rh_ansible/bgp-configs
 
 ---
 

@@ -8,5 +8,7 @@
   tasks:
     - name: "Task 1"
       arista.eos.eos_config:
-        src: bgp.j2
+        # src: "bgp.j2" # if the file is in the /templates directory
+        # src: "/root/ex457_rh_ansible/bgp-configs/bgp.j2"
+        src: "bgp-configs/bgp.j2"
         
