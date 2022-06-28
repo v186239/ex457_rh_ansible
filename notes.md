@@ -424,6 +424,8 @@ Create two j2 files for each vendor (normal.j2 or named.j2)
 
 In the hostvar for each device add the key:value for the style of vendor (example: eigrp_style: named or normal)
 
+In the playbook call the src file with the variable example: eigrp_style
+
 ---
 
 - name: "Play to test some variable substitution"
