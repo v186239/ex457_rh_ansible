@@ -11,5 +11,5 @@ BGP:
     - neighbor: 10.199.199.10
       peer_asn: "65010"
 
-    - neighbor: "192.168.77.1"
+    - neighbor: 192.168.77.1
       peer_asn: "771"
