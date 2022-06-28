@@ -1,4 +1,5 @@
 ---
+bgp_style: bgp
 
 BGP:
   ASN: "65010"

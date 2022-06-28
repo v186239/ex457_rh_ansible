@@ -1,4 +1,5 @@
 ---
+bgp_style: bgp
 
 ntp: "8.8.8.8"
 

@@ -1,5 +1,7 @@
 ---
 
+bgp_style: bgp
+
 BGP:
   ASN: "65001"
   peers: 
