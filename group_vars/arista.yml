@@ -1,5 +1,5 @@
 ansible_user: "admin"
-ansible_password: "Golf20!7"
+ansible_password: "qwerty"
 ansible_network_os: eos
 
 ntp: "10.10.10.10"

@@ -374,6 +374,44 @@ pip3 install netaddr
         #msg: "{{ myip | ipv6 }}"
         msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr }}"
 
+# Work with Templates
+
+Jinja2
+
+Jinja is a fast, expressive, extensible templating engine. Special placeholders in the template allow writing code similar to Python syntax. Then the template is passed data to render the final document.
+
+Variables
+https://jinja.palletsprojects.com/en/3.1.x/templates/#variables
+
+The following lines do the same thing:
+
+We will use these variables to print out a value.
+
+{{ foo.bar }}
+{{ foo['bar'] }}
+
+Arista eos config module with the src parameter to take a string value using a jinja2 template. 
+
+https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_config_module.html#ansible-collections-arista-eos-eos-config-module
+
+mkdir templates
+create a jinja2 file called bgp.j2
+
+Because you created a templates directory ansible will automatically look in the templates directory for j2 files
+
+---
+
+- name: "Play to test some variable substitution"
+  hosts: "R1"
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Task 1"
+      arista.eos.eos_config:
+        src: bgp.j2
+
+
 
 
 

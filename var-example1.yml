@@ -1,0 +1,12 @@
+---
+
+- name: "Play to test some variable substitution"
+  hosts: "arista"
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Task 1"
+      arista.eos.eos_config:
+        src: bgp.j2
+        
