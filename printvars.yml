@@ -1,9 +1,9 @@
 ---
 - name: "Printing some var info"
-  hosts: all
+  hosts: arista
   gather_facts: false 
 
   tasks:
     - name: "Displaying var stuff"
       debug:
-        msg: "{{ hostvars['R1'] }}"
+        msg: "{{ BGP.ASN }}"
