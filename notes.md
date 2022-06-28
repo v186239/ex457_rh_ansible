@@ -422,7 +422,7 @@ For example when dealing with multiple vendors with different os environments.
 
 Create two j2 files for each vendor (normal.j2 or named.j2)
 
-In the hostvar for device add the key:value for the style of vendor (example: eigrp_style: named or normal)
+In the hostvar for each device add the key:value for the style of vendor (example: eigrp_style: named or normal)
 
 ---
 
