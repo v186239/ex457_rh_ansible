@@ -1,0 +1,37 @@
+---
+
+- name: "Play to test some variable substitution"
+  hosts: "arista"
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Task 1"
+      arista.eos.eos_config:
+        # src: "bgp.j2" # if the file is in the /templates directory
+        # src: "/root/ex457_rh_ansible/bgp-configs/bgp.j2"
+        # src: "bgp-configs/bgp.j2"
+        src: "bgp.j2"
+    
+    - name: Executing an Arista show command
+      arista.eos.eos_command:
+        commands: "show run section bgp"
+      register: output
+
+    - name: debug
+      ansible.builtin.debug:
+        msg: "output"
+
+    - name: Set fact for the output of the show command
+      ansible.builtin.set_fact:
+        output_struct: "{{ output.stdout[0] }}"
+
+    - name: Display Output Structured Data
+      ansible.builtin.debug:
+        msg:
+          - "-------------------"
+          - "{{ inventory_hostname }}:"
+          - "{{ output_struct }}"
+          - "-------------------"
+
+        

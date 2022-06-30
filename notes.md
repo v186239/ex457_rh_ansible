@@ -440,6 +440,34 @@ In the playbook call the src file with the variable example: eigrp_style
 
 
 
+Jinja2 Loops with BGP logic
+
+{% for item in my_list %}
+
+Example:  Repetition think loops
+-------------------------------------
+Host vars file:
+bgp_style: bgp
+
+BGP:
+  ASN: "65001"
+  peers: 
+    - neighbor: 10.199.199.12
+      peer_asn: "65002"
+---------------------------------------
+
+router bgp {{ BGP.ASN }}
+
+{% for nbor in BGP.peers %}
+neighbor {{ nbor.neighbor }} remote-as {{ nbor.peer_asn}}
+{% endfor %}  # this will end the for loop on nbor
+
+--------------OUTPUT FROM LOOP--------------------
+router bgp 65001
+neighboer 10.199.199.12 remote-as 65001
+---------------------------------------------------
+
+
 
 
 

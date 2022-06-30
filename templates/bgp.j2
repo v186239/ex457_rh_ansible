@@ -1,0 +1,5 @@
+router bgp {{ BGP.ASN }}
+
+{% for nbor in BGP.peers %}
+neighbor {{ nbor.neighbor }} remote-as {{ nbor.peer_asn}}
+{% endfor %}
