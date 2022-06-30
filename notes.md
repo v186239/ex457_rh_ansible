@@ -375,7 +375,7 @@ pip3 install netaddr
         #msg: "{{ myip | ipv6 }}"
         msg: "Print out only valid IP addresses in myip list {{ myip | ipaddr }}"
 
-# Work with Templates
+# Work with Jinja2 Templates
 
 Jinja2
 
@@ -499,6 +499,16 @@ neighbor {{ nbor.neighbor }} remote-as {{ nbor.peer_asn}}
 
 ---------------------------------------------------
 
+
+
+# Registers, Handlers & Vault Secrets
+
+ - Registering Variables 
+
+When we push configs to a devices how do we see what commands have taken?
+
+Capture the output from a particular task using the "register" module in ansible. 
+The register module will capture the output into a variable which can be used with a debug module to print output.
 
 
 
