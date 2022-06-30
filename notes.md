@@ -2,6 +2,7 @@
 
 # DOWNLOAD THE CODE:
 https:bit.ly/3ERJcCJ
+https://github.com/IPvZero/CodeSamples
 https://github.com/IPvZero/CodeSamples/tree/main/Ansible/
 
 # Install Ansible
@@ -468,6 +469,35 @@ neighboer 10.199.199.12 remote-as 65001
 ---------------------------------------------------
 
 
+Jinja2 Conditions with BGP logic
+
+In the lab clear BGP config on all devices.
+
+Some configurations on some devices based on a conditional statement.
+
+if: if something is true
+
+elif: if something else is true
+
+else: if none of the conditions above are true use this else fail safe statement
+
+endif:  will end the conditional statement
+
+Include the conditional statements within the for loop.
+
+--------------------------------------------------------
+router bgp {{ BGP.ASN }}
+
+{% for nbor in BGP.peers %}
+{% if nbor.peer_asn == "65002" %}
+neighbor {{ nbor.neighbor }} remote-as {{ nbor.peer_asn}}
+neighbor {{ nbor.neighbor}} update-source loopback0
+{% else %}
+neighbor {{ nbor.neighbor }} remote-as {{ nbor.peer_asn}}
+{% endif %}
+{% endfor %}
+
+---------------------------------------------------
 
 
 
