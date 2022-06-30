@@ -527,7 +527,7 @@ The register module will capture the output into a variable which can be used wi
      debug:
        msg:  "{{ ntp_result.commands }}"
 
-==================================================
+---------------------------------------------------
 
  - Handlers
 
