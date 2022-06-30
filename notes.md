@@ -510,6 +510,29 @@ When we push configs to a devices how do we see what commands have taken?
 Capture the output from a particular task using the "register" module in ansible. 
 The register module will capture the output into a variable which can be used with a debug module to print output.
 
+---
+
+- name: "REGISTER PLAYBOOK"
+  hosts: switch
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+   - name: "Push NTP config"
+     arista.eos.eos_config:
+       src: "ntp.j2"
+     register: ntp_result
+
+   - name: "Print result"
+     debug:
+       msg:  "{{ ntp_result.commands }}"
+
+==================================================
+
+ - Handlers
+
+
+
 
 
 
