@@ -1,0 +1,70 @@
+---
+- name: "Play 1 - Configure syslog and target Arista Devices"
+  hosts: arista
+  connection: network_cli
+
+  tasks:
+    - name: Task 1 configure host logging when no port key is defined
+      arista.eos.eos_logging:
+        dest: host
+        name: "{{ item.ip }}"
+        state: present
+      loop: "{{ syslog.hosts }}"
+      when: item.port is not defined
+      register: task1_output
+
+    - name: "Print Task1 output"
+      debug:
+        msg: "{{ item.commands }}"
+      loop: "{{ task1_output.results }}"
+      loop_control:
+        label: none
+      when: item.commands is defined
+
+    - name: Task 2 configure host logging when port key is defined
+      arista.eos.eos_logging:
+        dest: host
+        name: "{{ item.ip }}"
+        provider:
+          port: "{{ item.port }}"
+        state: present
+      loop: "{{ syslog.hosts }}"
+      when: item.port is defined
+      register: task2_output
+
+    - name: "Print Task2 output"
+      debug:
+        msg: "{{ item.commands }}"
+      loop: "{{ task2_output.results }}"
+      loop_control:
+        label: none
+      when: item.commands is defined
+
+    - name: configure console logging level and facility
+      arista.eos.eos_logging:
+        dest: console
+        facility: local7
+        level: debugging
+        state: present
+      register: arista_output
+
+    - name: "Print Arista output"
+      debug:
+        msg: "{{ arista_output.commands }}"
+
+    # - name: enable logging to all
+    #   arista.eos.eos_logging:
+    #     dest: on
+
+    # - name: configure buffer size
+    #   arista.eos.eos_logging:
+    #     dest: buffered
+    #     size: 5000
+
+    # - name: Configure logging using aggregate
+    #   arista.eos.eos_logging:
+    #     aggregate:
+    #     - {dest: console, level: warnings}
+    #     - {dest: buffered, size: 480000}
+    #     state: present
+

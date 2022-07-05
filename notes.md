@@ -211,6 +211,54 @@ Looping through configured interfaces
         msg: "{{ ansible_net_hostname }} has an IP address {{ item }} configured"
       loop: "{{ ansible_net_all_ipv4_addresses }}"
 
+------------------------------------------------------------------------------------------------------
+
+Using loop control labels in debug module to only show output from commands example
+
+---
+- name: "Play 1 - Configure syslog and target Arista Devices"
+  hosts: arista
+  connection: network_cli
+
+  tasks:
+    - name: Task 1 configure host logging when no port key is defined
+      arista.eos.eos_logging:
+        dest: host
+        name: "{{ item.ip }}"
+        state: present
+      loop: "{{ syslog.hosts }}"
+      when: item.port is not defined
+      register: task1_output
+
+    - name: "Print Task1 output"
+      debug:
+        msg: "{{ item.commands }}"
+      loop: "{{ task1_output.results }}"
+      loop_control:
+        label: none   <-------------------------------Nothing special about the world none is just label with the key.  If key is not present it will not output>
+      when: item.commands is defined
+
+    - name: Task 2 configure host logging when port key is defined
+      arista.eos.eos_logging:
+        dest: host
+        name: "{{ item.ip }}"
+        provider:
+          port: "{{ item.port }}"
+        state: present
+      loop: "{{ syslog.hosts }}"
+      when: item.port is defined
+      register: task2_output
+
+    - name: "Print Task2 output"
+      debug:
+        msg: "{{ item.commands }}"
+      loop: "{{ task2_output.results }}"
+      loop_control:
+        label: none
+      when: item.commands is defined
+
+
+
 # Conditional Logic & Filtering
 
 https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html
