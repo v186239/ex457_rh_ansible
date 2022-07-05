@@ -1,7 +1,7 @@
 router bgp {{ BGP.ASN }}
 
 {% for nbor in BGP.peers %}
-{% if nbor.peer_asn == "^65.*$" %}
+{% if nbor.peer_asn >= "65000" %}
 neighbor {{ nbor.neighbor }} remote-as {{ nbor.peer_asn}}
 neighbor {{ nbor.neighbor}} update-source loopback0
 {% else %}
