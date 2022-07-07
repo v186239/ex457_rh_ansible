@@ -579,6 +579,53 @@ The register module will capture the output into a variable which can be used wi
 
  - Handlers
 
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html
+
+Handlers running operation on change of state like a conditional.
+
+Notify allows us to run a specific task on the conditional basis.
+
+Example 1:
+---
+
+- name: "REGISTER PLAYBOOK"
+  hosts: switch
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+   - name: "Push NTP config"
+     arista.eos.eos_config:
+       src: "ntp.j2"
+     notify: ntp_handler_example
+     register: ntp_result
+
+  handlers:
+   - name: ntp_handler_example
+     debug:
+       msg: "{{ ntp_result.commands }}"
+
+Example 2:  With the listen key to listen for the notify name.   
+
+---
+
+- name: "REGISTER PLAYBOOK"
+  hosts: switch
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+   - name: "Push NTP config"
+     arista.eos.eos_config:
+       src: "ntp.j2"
+     notify: ntp_handler_example
+     register: ntp_result
+
+  handlers:
+   - name: "HANDLER 1 - This will check for NTP Updates"
+     listen: ntp_handler_example
+     debug:
+       msg: "{{ ntp_result.commands }}"
 
 
 

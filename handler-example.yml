@@ -1,0 +1,19 @@
+---
+
+- name: "REGISTER PLAYBOOK"
+  hosts: switch
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+   - name: "Push NTP config"
+     arista.eos.eos_config:
+       src: "ntp.j2"
+     notify: ntp_handler_example
+     register: ntp_result
+
+  handlers:
+   - name: "HANDLER 1 - This will check for NTP Updates"
+     listen: ntp_handler_example
+     debug:
+       msg: "{{ ntp_result.commands }}"
