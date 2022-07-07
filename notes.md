@@ -667,6 +667,124 @@ When you pass a vault ID as an option to the ansible-vault command, you add a la
 
 ------------------------------   Ansible Vault  ----------------------------------------------------
 
+Using Ansible Vault 
+
+ansible-vault --help
+positional arguments:
+  {create,decrypt,edit,view,encrypt,encrypt_string,rekey}
+    create              Create new vault encrypted file
+    decrypt             Decrypt vault encrypted file
+    edit                Edit vault encrypted file
+    view                View vault encrypted file
+    encrypt             Encrypt YAML file
+    encrypt_string      Encrypt a string
+    rekey               Re-key a vault encrypted file
+
+To encrypt an already existing file use 
+
+ansible-vault encrypt {{ filename }}
+
+root@eveng-2:~/ex457_rh_ansible/group_vars# ansible-vault encrypt usa.yml
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+root@eveng-2:~/ex457_rh_ansible/group_vars# cat usa.yml 
+$ANSIBLE_VAULT;1.1;AES256
+61396333346162656162363735643363333766323230623261316466323965656532313831386265
+3130326638383732303633393738333337626139613466390a656165343335656561663338396138
+65313865663735363234306335633061333166326666353762363031326632623665363666666666
+6534376264366262350a393330343966353330323637653634386563663665626461346338613835
+30663035376631393637323764343935613165316561613535313837346263613737623662656561
+34333333343065343832336263363338396130363239343733393136303665306138386466333463
+64366631616163376462356233376231376330353736653636363066353161303737393339366665
+65386366653337323461653764613261663331326638623739333463313261346537303763343335
+6531
+
+---
+
+- name: " Print some encrypted stuff"
+  hosts: usa
+  gather_facts: no
+
+  tasks:
+    - name: "Task1 - decrypt and print"
+      debug:
+        msg: "{{ super_secret_bgp }}"
+
+root@eveng-2:~/ex457_rh_ansible# ansible-playbook encrypt-test.yml --ask-vault-pass
+
+To view information in the encrypted file use
+
+root@eveng-2:~/ex457_rh_ansible# ansible-vault view group_vars/usa.yml 
+Vault password: 
+---
+
+ntp: "10.10.10.10"
+
+ospf:
+  rid: "3.3.3.3"
+
+super_secret_bgp: 5432
+ninja_ospf: "5"
+root@eveng-2:~/ex457_rh_ansible# 
+
+To edit encrypted file
+
+root@eveng-2:~/ex457_rh_ansible# ansible-vault edit group_vars/usa.yml 
+
+
+How to create an encrypted file
+
+root@eveng-2:~/ex457_rh_ansible/group_vars# ansible-vault create uk.yml
+
+---
+
+- name: " Print some encrypted stuff"
+  hosts: uk
+  gather_facts: no
+
+  tasks:
+    - name: "Task1 - decrypt and print"
+      debug:
+        msg: "{{ snmp_stuff }}"
+
+root@eveng-2:~/ex457_rh_ansible# ansible-playbook encrypt-test.yml --ask-vault-pass
+
+TASK [Task1 - decrypt and print] ********************************************************************************************************************************************************************************
+MSG:
+
+{'community': 'cbtnuggets', 'server': '7.7.1.2', 'mode': 'RW', 'location': 'Oregon', 'contact': 'John McGovern'}
+
+To Decryt a file use
+root@eveng-2:~/ex457_rh_ansible# ansible-vault decrypt group_vars/uk.yml 
+Vault password: 
+Decryption successful
+
+---
+
+snmp_stuff:
+  community: "cbtnuggets"
+  server: 7.7.1.2
+  mode: "RW"
+  location: "Oregon"
+  contact: "John McGovern"
+
+To encrypt the file again use
+
+root@eveng-2:~/ex457_rh_ansible# ansible-vault encrypt group_vars/uk.yml
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+
+To rekey or change the password of an already encrypted file use
+
+root@eveng-2:~/ex457_rh_ansible# ansible-vault rekey group_vars/uk.yml 
+Vault password: 
+New Vault password: 
+Confirm New Vault password: 
+Rekey successful
+
+
 
 
 
