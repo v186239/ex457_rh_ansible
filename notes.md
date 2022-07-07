@@ -784,6 +784,52 @@ New Vault password:
 Confirm New Vault password: 
 Rekey successful
 
+# Ansible Galaxy and Roles
+
+Roles make our jobs way easier.
+
+Role gives you a reusable, portable, bite-sized playbook to allow modifications and collaboration with other team memembers.
+
+Similar to a python function which can be easily shared.
+
+You can import other playbooks into a role.
+
+When we create a role it builds a core structure.  The name of the role defines the TOP level directory.
+
+ntp-config
+ - tasks
+ - handlers
+
+You can manually create a role structure but it is much easier to use the auto-generate command below.
+
+Ansible Galaxy can be used to create roles using auto-generate command "ansible-galaxy init {{ name of the role}}"
+
+--------- ROLE DIRECTORY STRUCTURE -----------
+
+root@eveng-2:~/ex457_rh_ansible# ansible-galaxy init nuggets
+
+root@eveng-2:~/ex457_rh_ansible# tree nuggets/
+nuggets/
+├── README.md
+├── defaults  <---Low order of preference for variables
+│   └── main.yml
+├── files     <---Static files used by the roles tasks
+├── handlers  <---Used to define handlers with the notify key
+│   └── main.yml
+├── meta      <---metadata about the role itself.  basic info of the role, like the author of the role, licensing, platforms, dependencies for the role to run
+│   └── main.yml
+├── tasks
+│   └── main.yml <--- Ansible playbook tasks that the role is going to take
+├── templates <---Templates directory used to store Jinja2 Template files
+├── tests  <--- Designed for testing lab environments using the inventory of lab devices with the test.yml file.  
+│   ├── inventory
+│   └── test.yml
+└── vars <---Used to store variables for the playbook tasks that has precedence over the defaults main.yml variables file.
+    └── main.yml
+
+--------- ROLE DIRECTORY STRUCTURE -----------
+
+
 
 
 
