@@ -1,0 +1,20 @@
+---
+
+- name: "Playbook1: Testing Genie"
+  hosts: switch
+  conneciton: network_cli
+
+  tasks:
+    - name: "Task 1 - send a show command"
+      arista.eos.eos_command:
+        commands: "show version"
+      register: show_version_output
+
+    - name: "Task 2 - Parse show command"
+      set_fact: #  This will create a variable from the register show_version_output
+        parsed_data: >-
+          {{ show_version_output.stdout[0] }}
+
+    - name: "Task 3- print show command"
+      ansible.builtin.debug:
+        msg: "{{ parsed_data }}"

@@ -1,0 +1,20 @@
+---
+
+- name: "Playbook1: Testing Genie"
+  hosts: switch
+  connection: network_cli
+
+  tasks:
+    - name: "Task 1 - send a show command"
+      arista.eos.eos_command:
+        commands: "show ip route"
+      register: show_ip_route_output
+
+    - name: "Task 2 - Parse show command"
+      set_fact: 
+        parsed_data: >-
+          {{ show_ip_route_output.stdout[0] | clay584.genie.parse_genie(command='show ip route', os='eos') }}
+
+    - name: "Task 3- print show command"
+      ansible.builtin.debug:
+        msg: "{{ show_ip_route_output }}"

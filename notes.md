@@ -874,11 +874,93 @@ Then run the playbook
 root@eveng-2:~/ex457_rh_ansible# ansible-playbook execute_ospf_role.yml -i hosts
 
 
+----------- EXPLORING ANSIBLE GALAXY ------------------------------------------
+
+You can use other peoples roles hosted on the Ansible Galaxy website. 
+
+Type of Market place for ansible and roles which you can download and have full access to use.
+
+https://galaxy.ansible.com/
 
 
+You can click community to see collections, download, install or go straight to GIT repo.
 
+Example search for genie collection
 
+https://galaxy.ansible.com/clay584/genie
 
+Next we will download genie and use it as an example.
+
+This will show you everything you installed from ansible-galaxy 
+
+ansible-galaxy list
+
+Search ansible-galaxy from command line
+
+ansible-galaxy search netbox
+
+Command to install genie ansible collection
+
+ansible-galaxy collection install clay584.genie
+
+apt-get install python3-venv
+
+root@eveng-2:~/ex457_rh_ansible# python3 -m venv .venv
+root@eveng-2:~/ex457_rh_ansible# cd .venv/
+root@eveng-2:~/ex457_rh_ansible/.venv# source bin/activate
+(.venv) root@eveng-2:~/ex457_rh_ansible/.venv# cd ..
+(.venv) root@eveng-2:~/ex457_rh_ansible# 
+(.venv) root@eveng-2:~/ex457_rh_ansible# pip3 --version
+(.venv) root@eveng-2:~/ex457_rh_ansible# pip3 install pyats
+(.venv) root@eveng-2:~/ex457_rh_ansible# pip3 install genie
+
+Create an example playbook to parse data
+
+---
+
+- name: "Playbook1: Testing Genie"
+  hosts: switch
+  conneciton: network_cli
+
+  tasks:
+    - name: "Task 1 - send a show command"
+      arista.eos.eos_command:
+        commands: "show version"
+      register: show_version_output
+
+    - name: "Task 2 - Parse show command"
+      set_fact: #  This will create a variable from the register show_version_output
+        parsed_data: >-
+          {{ show_version_output.stdout[0] }}
+
+    - name: "Task 3- print show command"
+      ansible.builtin.debug:
+        msg: "{{ parsed_data }}"
+
+Create and example playbook to parse data using genie | filter within the varaible
+
+---
+
+- name: "Playbook1: Testing Genie"
+  hosts: switch
+  connection: network_cli
+
+  tasks:
+    - name: "Task 1 - send a show command"
+      arista.eos.eos_command:
+        commands: "show version"
+      register: show_version_output
+
+    - name: "Task 2 - Parse show command"
+      set_fact: 
+        parsed_data: >-
+          {{ show_version_output.stdout[0] | clay584.genie.parse_genie(command='show version', os='eos') }}
+
+    - name: "Task 3- print show command"
+      ansible.builtin.debug:
+        msg: "This device has been up for {{ parsed_data.version.uptime }}"
+
+# VYOS
 
 
 
