@@ -1,0 +1,6 @@
+ip routing
+router ospf {{ OSPF.asn }}
+router {{ OSPF.rid }}
+{% for network in OSPF.networks %}
+network {{ network }} area 0
+{% endfor %}

@@ -829,6 +829,14 @@ nuggets/
 
 --------- ROLE DIRECTORY STRUCTURE -----------
 
+Roles are supposed to be portable.  You do not want to hard code credentials within that role. 
+
+Pass in credentials as a parameter.  
+
+Creating a Role
+
+
+
 
 
 

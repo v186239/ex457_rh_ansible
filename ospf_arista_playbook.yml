@@ -1,0 +1,26 @@
+---
+
+- name: "Play to configure OSPF Stuff"
+  hosts: switch
+  connection: network_cli
+
+  tasks:
+    - name: "TASK1 - push OSPF"
+      arista.eos.eos_config:
+        src: "ospf.j2"
+      register: ospf
+
+    - name: "TASK2 - print OSPF CONFIG"
+      debug:
+        msg: "{{ ospf.commands }}"
+
+    - name: "TASK3 - verify OSPF CONFIG"
+      arista.eos.eos_command:
+        commands: "show run | section ospf"
+      register: ospf_show_output
+
+    - name: "TASK4 - print show command"
+      ansible.builtin.debug:
+        msg: "{{ ospf_show_output.stdout_lines }}"
+      
+  
