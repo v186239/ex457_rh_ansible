@@ -1,0 +1,23 @@
+---
+# tasks file for ospf_role
+
+- name: "TASK1 - {{ TASK_ONE_NAME }}"
+  arista.eos.eos_config:
+    src: "{{ ospf_template }}"
+  register: ospf
+
+- name: "TASK2 - {{ TASK_TWO_NAME }}"
+  debug:
+    msg: "{{ ospf.commands }}"
+
+- name: "TASK3 - {{ TASK_THREE_NAME }}"
+  arista.eos.eos_command:
+    commands: "show run | section ospf"
+  register: ospf_show_output
+
+- name: "TASK4 - {{ TASK_THREE_NAME }}"
+  ansible.builtin.debug:
+    msg: "{{ ospf_show_output.stdout_lines }}"
+
+
+      

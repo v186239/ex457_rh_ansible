@@ -1,0 +1,10 @@
+---
+
+- name: "Playbook to configure OSPF using a role"
+  hosts: switch
+  connection: network_cli
+
+  roles:
+    - ospf_role
+
+  

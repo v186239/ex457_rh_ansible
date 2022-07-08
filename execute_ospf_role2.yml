@@ -1,0 +1,22 @@
+---
+
+- name: "Different role playbook with tasks"
+  hosts: switch
+  connection: network_cli
+  vars:
+   - TASK_ONE_NAME: "TOTALLY DIFFERENT TASK ONE NAME TO OVERIDE ROLES DEFAULT VARS"
+
+  roles:
+    - ospf_role
+
+  tasks:
+    - name: "FURTHER VERIFY OSPF"
+      arista.eos.eos_command:
+        commands: "show ip ospf interface brief"
+      register: "new_show_output"
+
+    - name: "PRINT VERIFICATION"
+      ansible.builtin.debug:
+          msg: "{{ new_show_output }}"
+
+  

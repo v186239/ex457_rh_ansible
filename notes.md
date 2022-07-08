@@ -835,7 +835,43 @@ Pass in credentials as a parameter.
 
 Creating a Role
 
+ansible-galaxy init ospf_role
 
+root@eveng-2:~/ex457_rh_ansible# tree ospf_role/
+ospf_role/
+├── README.md
+├── defaults
+│   └── main.yml <--Has the variables used in the tasks
+├── files
+├── handlers
+│   └── main.yml
+├── meta
+│   └── main.yml
+├── tasks
+│   └── main.yml  <--Has the playbook tasks to configure OSPF
+├── templates
+│   └── ospf_role_example.j2
+├── tests
+│   ├── inventory
+│   └── test.yml
+└── vars
+    └── main.yml
+
+
+Create a playbook which uses the role
+
+---
+
+- name: "Playbook to configure OSPF using a role"
+  hosts: switch
+  connection: network_cli
+
+  roles:
+    - ospf_role
+
+Then run the playbook
+
+root@eveng-2:~/ex457_rh_ansible# ansible-playbook execute_ospf_role.yml -i hosts
 
 
 
