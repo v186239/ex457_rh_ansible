@@ -1050,6 +1050,21 @@ edit ansible.cfg and add this line
 
 display_skipped_hosts = false
 
+-----------------------------------------------------------------------------------------------------------------
+
+Interface Configuration
+
+Arista Ansible Interface module
+
+https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_interfaces_module.html
+
+VyOS Ansible Interface module
+
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/index.html
+
+
+To move data in VS Code hold down Ctrl and push the right or left square brackets [ or ]
+
 
 
 

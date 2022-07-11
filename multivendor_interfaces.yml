@@ -1,0 +1,48 @@
+---
+
+- name: "Multivendor Fact-Gathering Playbook"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: Merge provided configuration with device configuration
+      arista.eos.eos_interfaces:
+        config:
+        - name: Ethernet1
+          description: Configured by Ansible
+          enabled: true
+        - name: Ethernet2
+          description: Configured by Ansible
+          enabled: false
+        state: merged
+      register: eos_facts
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: Merge provided configuration with device configuration
+      vyos.vyos.vyos_interfaces:
+        config:
+        - name: eth2
+          description: Configured by Ansible
+          enabled: true
+          vifs:
+          - vlan_id: 200
+            description: VIF 200 - ETH2
+
+        - name: eth3
+          description: Configured by Ansible
+          mtu: 1500
+        state: merged
+      register: vyos_facts
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Print Arista Output"
+      debug:
+        # msg: "{{ eos_facts.ansible_facts.ansible_net_config.split('\n') }}"
+        msg: "{{ eos_facts }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+  
+    - name: "Print VyOS Output"
+      debug:
+        # msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0].split('\n')  }}"
+        msg: "{{ vyos_facts }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
