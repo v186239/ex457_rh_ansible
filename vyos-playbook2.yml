@@ -1,0 +1,18 @@
+---
+
+- name: "Vyos Playbook"
+  hosts: vyos
+  connection: network_ci
+
+  tasks:
+    - name: "Remove banner configuration to Vyos"
+      vyos.vyos.vyos_banner:
+        banner: pre-login
+        text: "CBG NUGGETS BANNER for VyOS"
+        state: absent
+
+    - name: "Adding post-login VyOS banner"
+      vyos.vyos.vyos_banner:
+        banner: post-login
+        text: "This is a POST login banner"
+        state: present
