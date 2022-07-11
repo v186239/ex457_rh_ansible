@@ -962,7 +962,43 @@ Create and example playbook to parse data using genie | filter within the varaib
 
 # VYOS
 
+VYOS is an Open Source Router and Firewall.
 
+GNU / LINUX WITH NETWORKING FUNCTIONS 
+
+ANSIBLE MODULES FOR VYOS ARE AVAILABLE.
+
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_config_module.html
+
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/index.html
+
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_command_module.html#ansible-collections-vyos-vyos-vyos-command-module
+
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_config_module.html#ansible-collections-vyos-vyos-vyos-config-module
+
+VYOS uses "set" command to configure things.
+
+Examples Ansible Playbook Tasks:
+
+- name: configure the remote device
+  vyos.vyos.vyos_config:
+    lines:
+    - set system host-name {{ inventory_hostname }}
+    - set service lldp
+    - delete service dhcp-server
+
+- name: backup and load from file
+  vyos.vyos.vyos_config:
+    src: vyos.cfg
+    backup: yes
+
+- name: render a Jinja2 template onto the VyOS router
+  vyos.vyos.vyos_config:
+    src: vyos_template.j2
+
+There is also an Ansible Galaxy for VYOS
+
+ansible-galaxy collection install vyos.vyos
 
 
 
