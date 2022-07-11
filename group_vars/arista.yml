@@ -1,6 +1,6 @@
 ansible_user: "admin"
 ansible_password: "qwerty"
-ansible_network_os: eos
+ansible_network_os: arista.eos.eos
 
 ntp: "10.10.10.10"
 

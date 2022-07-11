@@ -1,0 +1,30 @@
+---
+
+- name: "Multivendor Fact-Gathering Playbook"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Pull Arista facts"
+      arista.eos.eos_facts:
+        gather_subset: config
+      register: eos_facts
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Pull VyOS facts"
+      vyos.vyos.vyos_facts:
+        gather_subset: config
+      register: vyos_facts
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Print Arista Output"
+      debug:
+        # msg: "{{ eos_facts.ansible_facts.ansible_net_config.split('\n') }}"
+        msg: "{{ eos_facts.ansible_facts.ansible_net_config }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+  
+    - name: "Print VyOS Output"
+      debug:
+        # msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0].split('\n')  }}"
+        msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0] }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"

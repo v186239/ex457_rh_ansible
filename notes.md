@@ -1000,7 +1000,55 @@ There is also an Ansible Galaxy for VYOS
 
 ansible-galaxy collection install vyos.vyos
 
+Example VyOS playbooks:
 
+---
+
+- name: "Vyos Playbook"
+  hosts: vyos
+  connection: network_ci
+
+  tasks:
+    - name: "Push some banner configuration to Vyos"
+      vyos.vyos.vyos_banner:
+        banner: pre-login
+        text: "CBG NUGGETS BANNER for VyOS"
+        state: present
+
+---
+
+- name: "Multivendor Fact-Gathering Playbook"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Pull Arista facts"
+      arista.eos.eos_facts:
+        gather_subset: config
+      register: eos_facts
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Pull VyOS facts"
+      vyos.vyos.vyos_facts:
+        gather_subset: config
+      register: vyos_facts
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Print Arista Output"
+      debug:
+        msg: "{{ eos_facts.ansible_facts.ansible_net_config }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+  
+    - name: "Print VyOS Output"
+      debug:
+        msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0] }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+----- NOTE FOR ANSIBLE.CFG FILE YOU CAN SKIP DISPLAY OF SKIP DEVICES WHEN CONDITIONS ARE USED  ----------
+
+edit ansible.cfg and add this line
+
+display_skipped_hosts = false
 
 
 
