@@ -4,7 +4,7 @@ R2 ansible_host=10.199.199.12
 R3 ansible_host=10.199.199.13
 
 [arista]
-switch ansible_host=10.199.199.10
+# switch ansible_host=10.199.199.10
 R1 ansible_host=10.199.199.11
 R2 ansible_host=10.199.199.12
 

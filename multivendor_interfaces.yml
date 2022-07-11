@@ -9,11 +9,11 @@
       arista.eos.eos_interfaces:
         config:
         - name: Ethernet1
-          description: Configured by Ansible
+          description: Configured by Will Ansible
           enabled: true
         - name: Ethernet2
-          description: Configured by Ansible
-          enabled: false
+          description: Configured by Will Ansible
+          enabled: true
         state: merged
       register: eos_facts
       when: "ansible_network_os == 'arista.eos.eos'"
@@ -22,14 +22,14 @@
       vyos.vyos.vyos_interfaces:
         config:
         - name: eth2
-          description: Configured by Ansible
+          description: Configured by Will using Ansible
           enabled: true
           vifs:
           - vlan_id: 200
             description: VIF 200 - ETH2
 
         - name: eth3
-          description: Configured by Ansible
+          description: Configured by Will using Ansible
           mtu: 1500
         state: merged
       register: vyos_facts
@@ -38,11 +38,11 @@
     - name: "Print Arista Output"
       debug:
         # msg: "{{ eos_facts.ansible_facts.ansible_net_config.split('\n') }}"
-        msg: "{{ eos_facts }}"
+        msg: "{{ eos_facts.commands }}"
       when: "ansible_network_os == 'arista.eos.eos'"
   
     - name: "Print VyOS Output"
       debug:
         # msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0].split('\n')  }}"
-        msg: "{{ vyos_facts }}"
+        msg: "{{ vyos_facts.commands }}"
       when: "ansible_network_os == 'vyos.vyos.vyos'"
