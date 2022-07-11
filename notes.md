@@ -1065,6 +1065,93 @@ https://docs.ansible.com/ansible/latest/collections/vyos/vyos/index.html
 
 To move data in VS Code hold down Ctrl and push the right or left square brackets [ or ]
 
+---
+
+- name: "Multivendor Fact-Gathering Playbook"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: Merge provided configuration with device configuration
+      arista.eos.eos_interfaces:
+        config:
+        - name: Ethernet1
+          description: Configured by Will Ansible
+          enabled: true
+        - name: Ethernet2
+          description: Configured by Will Ansible
+          enabled: true
+        state: merged
+      register: eos_facts
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: Merge provided configuration with device configuration
+      vyos.vyos.vyos_interfaces:
+        config:
+        - name: eth2
+          description: Configured by Will using Ansible
+          enabled: true
+          vifs:
+          - vlan_id: 200
+            description: VIF 200 - ETH2
+
+        - name: eth3
+          description: Configured by Will using Ansible
+          mtu: 1500
+        state: merged
+      register: vyos_facts
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Print Arista Output"
+      debug:
+        # msg: "{{ eos_facts.ansible_facts.ansible_net_config.split('\n') }}"
+        msg: "{{ eos_facts.commands }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+  
+    - name: "Print VyOS Output"
+      debug:
+        # msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0].split('\n')  }}"
+        msg: "{{ vyos_facts.commands }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+# Configuring OSPF
+
+Before you start automating OSPF, always make sure you know what it is that you are trying to automation. 
+
+The blast radius for automation is huge and you can cause outages by pushing out automaiton.  
+
+Dymestify OSPF (OPEN SHORTEST PATH FIRST) ROUTING PROTOCOL
+
+Devices share routing information using OSPF dynamic routing protocol.
+
+OSPF is open standard protocol used by any vendor.  Unlike Cisco EIGRP.
+
+OSPF is a link state routing protocol.  Devices will share routing information across the area.
+
+Network AS managed by ansible.   
+
+Area 0 backbone area will connect to other areas.    
+
+All devices in the same area are internal and share routing links state information. 
+
+Multiarea OSPF allows us to partiion devices in different areas so link states are not impacted if automation tools break the network.
+
+OSPF devices form a neighbor relationship using hello packets then form an adjacency.  Once they devices are adjacent they can share routing information.
+
+Needed for OSPF adjacency. 
+1 - Area
+2 - Subnet
+3 - Authentication
+4-  Matching Timers 
+5-  Router ID - must be unique, using IP address.  Try to avoid duplicate Router ID on different devices.
+
+OSPF Stub areas - cut down amount of information coming into an OSPF area you can use a stub flag, which must match on both sides of the link.  
+
+PASSIVE INTERFACE - OSPF has a concept know as PASSIVE INTERFACE - used to block OSPF packet advertisement out of an interface, like to none OSPF speaking devices.
+
+BE CAREFUL, DONT BE LAZY AND ASSUME OSPF CONFIGURATION WON'T BREAK YOUR NETWORK.  UNDERSTAND WHERE YOU WILL BE CONFIGURING OSPF AND INTERFACES USED FOR OSPF!
+
+
 
 
 
