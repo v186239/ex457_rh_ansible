@@ -1190,7 +1190,58 @@ Create a playbook called ospf1.yml and configure OSPF using config lines
 
 Now configure OSPF using the arista.eos.eos_ospfv2 module for OSPF instead.
 
+Arista OSPF ansible module
 https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_ospfv2_module.html#ansible-collections-arista-eos-eos-ospfv2-module
+
+VyOS OSPF ansible module
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_config_module.html
+
+---
+
+- name: "OSPF PLAYBOOK"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Push Arista OSPF Config"
+      arista.eos.eos_ospfv2:
+        config:
+          processes:
+            - process_id: 1
+              router_id: "{{ ospf.rid }}"
+              networks:
+                - area: 13
+                  prefix: 13.14.15.0/24
+                - area: 0
+                  prefix: 10.0.0.0/24
+        state: merged
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Print Arista OSPF Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Push VyOS OSPF Config"
+      vyos.vyos.vyos_ospfv2:
+        config:
+          areas:
+            - area_id: '0'
+              network:
+                - address: "10.2.0.0/16"
+                - address: "12.13.0.0/16"
+
+        state: replaced  # <---- Will clean up and remove rogue configs.  Prevents configuration drifts.
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Print VyOS OSPF Config"
+      debug:
+        msg: "{{ vyos_output.commands }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+
 
 
 
