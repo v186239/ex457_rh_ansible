@@ -1,6 +1,16 @@
 ---
 ospf:
  rid: 2.2.2.2
+ default_originate: false
+ networks:
+   - prefix: "10.1.2.0/30"
+     area: "0"
+   - prefix: "10.2.3.0/30"
+     area: "0"
+   - prefix: "10.2.4.0/30"
+     area: "0"
+   - prefix: "2.2.2.2/32"
+     area: "0"
 
 # bgp_style: bgp
 

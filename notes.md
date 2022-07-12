@@ -1242,6 +1242,60 @@ https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_config_module
       when: "ansible_network_os == 'vyos.vyos.vyos'"
 
 
+OSPF Jinja2 Templates
+
+First configure host vars for R1, R2, R3, R4 with key values for ospf.networks
+
+Then build Jinja2.
+
+VYOS OSPF Jinja2 Template
+set protocols ospf parameters router-id {{ ospf.rid }}
+{% for ntwk in ospf.networks %}
+set protocols ospf area {{ ntwk.area }} network {{ ntwk.network }}
+{% endfor%}
+
+Arista OSPF Jinja2 Template
+router ospf 1
+   router-id {{ ospf.rid }}
+{% for ntwk in ospf.networks %}
+network {{ ntwk.prefix }} area {{ ntwk.area }}
+{% endfor %}
+{% if ospf.default_originate == true %}
+default-information originate
+{% endif %}
+
+
+---
+
+- name: "OSPF CONFIGS via JINJA"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Configure VyOS OSPF"
+      vyos.vyos.vyos_config:
+        src: "{{ ansible_network_os }}-ospf.j2"
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print VyOS OSPF Config"
+      debug:
+        msg: "{{ vyos_output.commands }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Configure Arista OSPF"
+      arista.eos.eos_config:
+        src: "{{ ansible_network_os }}-ospf.j2"
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista OSPF Config"
+      debug:
+        msg: "{{ arista_output.commands }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+--------------------- BGP OVERVIEW -----------------------------------------
+
 
 
 

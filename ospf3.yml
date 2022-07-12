@@ -1,0 +1,28 @@
+---
+
+- name: "OSPF CONFIGS via JINJA"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Configure VyOS OSPF"
+      vyos.vyos.vyos_config:
+        src: "{{ ansible_network_os }}-ospf.j2"
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print VyOS OSPF Config"
+      debug:
+        msg: "{{ vyos_output.commands }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Configure Arista OSPF"
+      arista.eos.eos_config:
+        src: "{{ ansible_network_os }}-ospf.j2"
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista OSPF Config"
+      debug:
+        msg: "{{ arista_output.commands }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
