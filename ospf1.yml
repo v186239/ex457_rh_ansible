@@ -1,0 +1,20 @@
+---
+
+- name: "OSPF PLAYBOOK"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Push Arista OSPF Config"
+      arista.eos.eos_config:
+        lines: 
+          - router ospf 1
+          - router-id {{ ospf.rid }}
+          - network 0.0.0.0 255.255.255.255 area 0
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Print Arista OSPF Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"

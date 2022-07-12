@@ -1153,8 +1153,44 @@ BE CAREFUL, DONT BE LAZY AND ASSUME OSPF CONFIGURATION WON'T BREAK YOUR NETWORK.
 
 --------------------------- OSPF TOPOLOGY SETUP -----------------------------
 
+Using EVE-NG we built a topology with R1 connected to R2,  R2 connected to R3 and R4.
 
+Updated hosts inventory with R3 and R4.
 
+--------------------------- OSPF TOPOLOGY SETUP -----------------------------
+
+--------------------------- OSPF AUTOMATION -----------------------------
+
+Let's start OSPF automation using an Ansible Playbook.
+
+First we will try to configure OSPF using OSPF Ansible modules with a simple configuration.
+
+Create a playbook called ospf1.yml and configure OSPF using config lines
+
+---
+
+- name: "OSPF PLAYBOOK"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Push Arista OSPF Config"
+      arista.eos.eos_config:
+        lines: 
+          - router ospf 1
+          - router-id {{ ospf.rid }}
+          - network 0.0.0.0 255.255.255.255 area 0
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Print Arista OSPF Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+Now configure OSPF using the arista.eos.eos_ospfv2 module for OSPF instead.
+
+https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_ospfv2_module.html#ansible-collections-arista-eos-eos-ospfv2-module
 
 
 

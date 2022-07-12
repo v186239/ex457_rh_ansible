@@ -1,37 +1,40 @@
 ---
-bgp_style: bgp
+ospf:
+ rid: 2.2.2.2
 
-ntp: "8.8.8.8"
+# bgp_style: bgp
 
-BGP:
-  ASN: "65002"
-  peers: 
-    - neighbor: 10.199.199.11
-      peer_asn: "65001"
+# ntp: "8.8.8.8"
 
-    - neighbor: 10.199.199.10
-      peer_asn: "65010"
+# BGP:
+#   ASN: "65002"
+#   peers: 
+#     - neighbor: 10.199.199.11
+#       peer_asn: "65001"
 
-    - neighbor: 192.168.77.1
-      peer_asn: "771"
+#     - neighbor: 10.199.199.10
+#       peer_asn: "65010"
 
-ntp:
-  servers:
-    - 1.1.1.1
-    - 2.2.2.2
-    - 5.5.5.5
+#     - neighbor: 192.168.77.1
+#       peer_asn: "771"
 
-syslog:
-  hosts:
-    - ip: 11.11.11.11
+# ntp:
+#   servers:
+#     - 1.1.1.1
+#     - 2.2.2.2
+#     - 5.5.5.5
 
-    - ip: 22.22.22.22
-      port: 1234
+# syslog:
+#   hosts:
+#     - ip: 11.11.11.11
 
-    - ip: 44.44.44.44
-      port: 4567
+#     - ip: 22.22.22.22
+#       port: 1234
 
-    - ip: 55.55.55.55
+#     - ip: 44.44.44.44
+#       port: 4567
 
-    - ip: 77.77.77.77
-      port: 7777
+#     - ip: 55.55.55.55
+
+#     - ip: 77.77.77.77
+#       port: 7777
