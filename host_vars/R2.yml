@@ -12,6 +12,18 @@ ospf:
    - prefix: "2.2.2.2/32"
      area: "0"
 
+bgp:
+  asn: "2"
+  rid: "2.2.2.2"
+  neighbors:
+    - neighbor: "10.1.2.1"
+      peer_asn: "1"
+    - neighbor: "10.2.3.2"
+      peer_asn: "3"
+    - neighbor: "10.2.4.2"
+      peer_asn: "4"
+
+      
 # bgp_style: bgp
 
 # ntp: "8.8.8.8"

@@ -9,6 +9,18 @@ ospf:
    - prefix: "1.1.1.1/32"
      area: "0"
 
+bgp:
+  asn: "1"
+  rid: "1.1.1.1"
+  neighbors:
+    - neighbor: "10.1.2.2"
+      peer_asn: "2"
+  networks:
+    - network: "99.99.99.99/32"
+    - network: "100.100.100.100/32"
+
+
+
 # bgp_style: bgp
 
 # BGP:

@@ -1,0 +1,29 @@
+---
+
+- name: "BGP CONFIGS via JINJA"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Configure VyOS BGP"
+      vyos.vyos.vyos_config:
+        src: "{{ ansible_network_os }}-bgp.j2"
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print VyOS BGP Config"
+      debug:
+        msg: "{{ vyos_output }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Configure Arista BGP"
+      arista.eos.eos_config:
+        src: "{{ ansible_network_os }}-bgp.j2"
+        # match: "none"
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista BGP Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"

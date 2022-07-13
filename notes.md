@@ -1367,11 +1367,78 @@ set protocols bgp neighbor 10.3.4.1 remote-as external
 
 --------------------- BGP Configuration Templates using Jinja2 -----------------------------------------
 
+Arista BGP Jinja2
+router bgp {{ bgp.asn }}
+  router-id {{ bgp.rid }}
+{% for neigh in bgp.neighbors %}
+  neighbor {{ neigh.neighbor }} remote-as {{ neigh.peer_asn }}
+{% endfor %}
+{% if bgp.networks is defined %}
+{% for ntwk in bgp.networks %}
+  network {{ ntwk.network }}
+{% endfor %}
+{% endif %}
 
+VyOS BGP Jinja2
+set protocols bgp local-as {{ bgp.asn }}
+set protocols bgp parameters router-id {{ bgp.rid }}
+{% for neigh in bgp.neighbors %}
+set protocols bgp neighbor {{ neigh }} address-family ipv4-unicast 
+set protocols bgp neighbor {{ neigh }} remote-as external
+{% endfor %}
 
+Ansible Playbook:
 
+---
 
+- name: "BGP CONFIGS via JINJA"
+  hosts: all
+  connection: network_cli
 
+  tasks:
+    - name: "Configure VyOS BGP"
+      vyos.vyos.vyos_config:
+        src: "{{ ansible_network_os }}-bgp.j2"
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print VyOS BGP Config"
+      debug:
+        msg: "{{ vyos_output }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+    - name: "Configure Arista BGP"
+      arista.eos.eos_config:
+        src: "{{ ansible_network_os }}-bgp.j2"
+        # match: "none"  # <---- Note that Arista and Cisco IOS have indentation in the configuration.  Using match none ignores indentation by ansible.  
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista BGP Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+Example R1 host vars:
+bgp:
+  asn: "1"
+  rid: "1.1.1.1"
+  neighbors:
+    - neighbor: "10.1.2.2"
+      peer_asn: "2"
+  networks:
+    - network: "99.99.99.99/32"
+    - network: "100.100.100.100/32"
+
+Example R3 host vars:
+bgp:
+  asn: "3"
+  rid: "3.3.3.3"
+  neighbors:
+    - "10.2.3.1"
+    - "10.3.4.2"
+
+--------------------- BGP Configuration using Ansible Modules -----------------------------------------
 
 
 
