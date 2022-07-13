@@ -1313,6 +1313,7 @@ ASN Autonomous System Numbers
 BGP scales very well.   
 
 eBGP - External BGP - BGP neighbors with different ASN numbers
+
 iBGP - Internal BGP - BGP neighbors with the same ASN numbers
 
 By default, eBGP runs a connected check to validated connectivity between directly connected peers.
@@ -1325,7 +1326,46 @@ vYOS uses something called BGP unnumbered (similar to Cumulus linux ) which uses
 
 --------------------- Create a BGP Topology  -----------------------------------------
 
+R1 = ASN1, R2 = ASN2, R3 = ASN3, R4 = ASN4
 
+R1 BGP configuration on Arista.  This configuration could be variablized using Jinja2.  Network statements can be looped with a condition in a Jinja2 template.
+
+R1(config-router-bgp)#do show run | sec bgp
+router bgp 1
+   router-id 1.1.1.1
+   neighbor 10.1.2.2 remote-as 2
+   neighbor 10.1.2.2 maximum-routes 12000 
+   network 99.99.99.99/32
+   network 100.100.100.100/32
+
+R2#show run | sec bgp
+router bgp 2
+   router-id 2.2.2.2
+   neighbor 10.1.2.1 remote-as 1
+   neighbor 10.1.2.1 maximum-routes 12000 
+   neighbor 10.2.3.2 remote-as 3
+   neighbor 10.2.3.2 maximum-routes 12000 
+   neighbor 10.2.4.2 remote-as 4
+   neighbor 10.2.4.2 maximum-routes 12000
+
+vyos@R3-yos# show protocols bgp
+vyos@R3-yos# history | grep 'set protocols bgp'
+set protocols bgp local-as 3
+set protocols bgp parameters router-id 3.3.3.3
+set protocols bgp neighbor 10.2.3.1 address-family ipv4-unicast 
+set protocols bgp neighbor 10.2.3.1 remote-as external
+set protocols bgp neighbor 10.3.4.2 address-family ipv4-unicast 
+set protocols bgp neighbor 10.3.4.2 remote-as external 
+
+vyos@R4-vyos:~$ history | grep 'set protocols bgp'
+set protocols bgp local-as 4
+set protocols bgp parameters router-id 4.4.4.4
+set protocols bgp neighbor 10.2.4.1 address-family ipv4-unicast 
+set protocols bgp neighbor 10.2.4.1 remote-as external 
+set protocols bgp neighbor 10.3.4.1 address-family ipv4-unicast 
+set protocols bgp neighbor 10.3.4.1 remote-as external 
+
+--------------------- BGP Configuration Templates using Jinja2 -----------------------------------------
 
 
 
