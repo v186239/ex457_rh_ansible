@@ -1296,6 +1296,41 @@ default-information originate
 
 --------------------- BGP OVERVIEW -----------------------------------------
 
+BGP Border Gateway Protocol
+
+BGP is the routing protocol used by the Internet
+
+BGP is an EGP Exterior Gateway Protocol
+
+BGP is used to communicate between different networks, externally, out of your control.
+
+BGP is used to communicate between autonomous systems.
+
+ASN Autonomous System Numbers
+   - Private ASN range numbers 64512 to 65535 used mainly internally within an autonomous system.
+   - Public ASN range numbers 1 to 64511.
+
+BGP scales very well.   
+
+eBGP - External BGP - BGP neighbors with different ASN numbers
+iBGP - Internal BGP - BGP neighbors with the same ASN numbers
+
+By default, eBGP runs a connected check to validated connectivity between directly connected peers.
+
+With eBGP, if you want to peer with a loopback it does require a change to the TTL (default 1 hop) to multihop.  
+
+With iBGP, the IGP is used and peering with loopback easier if IGP protocol provides connectivity.
+
+vYOS uses something called BGP unnumbered (similar to Cumulus linux ) which uses the keyword external or internal to specify the remote peer ASN automatically under the hood.
+
+--------------------- Create a BGP Topology  -----------------------------------------
+
+
+
+
+
+
+
 
 
 
