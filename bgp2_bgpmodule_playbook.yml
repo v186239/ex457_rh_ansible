@@ -1,0 +1,24 @@
+---
+
+- name: "BGP CONFIGS Playbook via MODULES"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista BGP"
+      arista.eos.eos_bgp:
+        config:
+          bgp_as: "{{ bgp.asn }}"
+          router_id: "{{ bgp.rid }}"
+          log_neighbor_changes: true
+          neighbors:
+          - neighbor: "{{ item.neighbor }}"
+            remote_as: "{{ item.peer_asn}}"
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+      loop: "{{ bgp.neighbors }}"
+    
+    - name: "Print Arista BGP Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"

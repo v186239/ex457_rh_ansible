@@ -1440,8 +1440,42 @@ bgp:
 
 --------------------- BGP Configuration using Ansible Modules -----------------------------------------
 
+BGP feature Ansible Modules
 
+Arista eos BGP Module
 
+https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_bgp_module.html#ansible-collections-arista-eos-eos-bgp-module
+
+VyOS BGP Module
+
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_bgp_global_module.html#ansible-collections-vyos-vyos-vyos-bgp-global-module
+
+Example playbook:
+
+---
+
+- name: "BGP CONFIGS Playbook via MODULES"
+  hosts: all
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista BGP"
+      arista.eos.eos_bgp:
+        config:
+          bgp_as: "{{ bgp.asn }}"
+          router_id: "{{ bgp.rid }}"
+          log_neighbor_changes: true
+          neighbors:
+          - neighbor: "{{ item.neighbor }}"
+            remote_as: "{{ item.peer_asn}}"
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+      loop: "{{ bgp.neighbors }}"  <--loop hostvars
+    
+    - name: "Print Arista BGP Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
 
 
 
