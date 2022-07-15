@@ -1478,9 +1478,39 @@ Example playbook:
       when: "ansible_network_os == 'arista.eos.eos'"
 
 
+# Configure VLANS
 
+--------------------- VLAN OVERVIEW -----------------------------------------
 
+VLAN = VIRTUAL LAN (LOCAL AREA NETWORK)
 
+4 PCs---SW1-----SW2----4 PCs
+
+Broadcast communicate to all devices on a network.
+
+When a devices sends a broadcast packet the switches forward out every interface.
+
+VLANS allow selective broadcast amongst a targeted group of hosts.
+
+VLANS break up the layer 2 broadcasts in a switch.
+
+VLANS allow switches to group interfaces together logically for different departments in a company like HR vs Finance Dept.
+
+Imagine each switch was on a different floor in a building.  
+
+Trunks allow multiple VLANS to traverse across links between switches.  VLANs are configured as allowed on trunks. 
+
+Access ports are used to connect to devices like a PC.
+
+Trunk ports are used for switch to switch communication.
+
+Layer 3 SVIs switch virtual interfaces are used to allow communication between different VLANs.  
+
+Access control list can be configured on SVIs to limit communication to certain devices in a VLAN.
+
+Be carefull when configuring VLANS using automation because you can cause an outage if you wipe out VLANs on let's say a trunk.
+
+--------------------- VLAN Create Topology -----------------------------------------
 
 
 
