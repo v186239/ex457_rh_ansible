@@ -1512,6 +1512,12 @@ Be carefull when configuring VLANS using automation because you can cause an out
 
 --------------------- VLAN Create Topology -----------------------------------------
 
+PC6 VLAN 5, PC7 VLAN 10 connected to "SW1----TRUNK-----SW2" connected to PC8 VLAN 5, PC9 VLAN 10
+
+--------------------- VLAN Configuration Jinja2 Templates  -----------------------------------------
+
+
+
 
 
 
