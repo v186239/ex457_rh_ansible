@@ -1,0 +1,17 @@
+---
+
+- name: "VLAN CONFIGS via JINJA"
+  hosts: arista
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista VLAN"
+      arista.eos.eos_config:
+        src: "{{ ansible_network_os }}-vlans.j2"
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista VLAN Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"

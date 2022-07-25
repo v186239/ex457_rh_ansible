@@ -19,7 +19,25 @@ bgp:
     - network: "99.99.99.99/32"
     - network: "100.100.100.100/32"
 
+vlans:
+  interfaces:
+    - interface: "Et4"
+      mode: access
+      vlan: 5
+    - interface: "Et5"
+      mode: access
+      vlan: 10
+    - interface: "Et2"
+      mode: trunk
+  vlan:
+    - number: "5"
+      name: "FIVE"
+      svi: "192.168.5.1 255.255.255.0"
+    - number: "10"
+      name: "TEN"
+      svi: "192.168.10.1 255.255.255.0"
 
+      
 
 # bgp_style: bgp
 

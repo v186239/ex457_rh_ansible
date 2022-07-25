@@ -1,0 +1,9 @@
+---
+
+- name: "VLAN CONFIGS via Jinja"
+  hosts: R1
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista VLAN"
+      template: src={{ ansible_network_os }}-vlans.j2 dest=r1.conf

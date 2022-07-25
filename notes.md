@@ -1516,6 +1516,71 @@ PC6 VLAN 5, PC7 VLAN 10 connected to "SW1----TRUNK-----SW2" connected to PC8 VLA
 
 --------------------- VLAN Configuration Jinja2 Templates  -----------------------------------------
 
+Ansible Playbook:
+---
+
+- name: "VLAN CONFIGS via JINJA"
+  hosts: arista
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista VLAN"
+      arista.eos.eos_config:
+        src: "{{ ansible_network_os }}-vlans.j2"
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista VLAN Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+HOST VARS
+
+vlans:
+  interfaces:
+    - interface: "Et4"
+      mode: access
+      vlan: 5
+    - interface: "Et5"
+      mode: access
+      vlan: 10
+    - interface: "Et2"
+      mode: trunk
+  vlan:
+    - number: 5
+      name: "FIVE"
+      svi: "192.168.5.1 255.255.255.0"
+    - number: 10
+      name: "TEN"
+      svi: "192.168.10.1 255.255.255.0"
+
+JINJA2 Template
+
+{% for vl in vlans.vlan %}
+vlan {{ vl.number }}
+name {{ vl.name }}
+interface vlan {{ vl.number }}
+ip address {{ vl.svi }}
+no shut
+exit
+{% endfor %}
+
+{% for intf in vlans.interfaces %}
+{% if intf.mode == "access"%}
+interface {{ intf.interface }}
+switchport mode access
+switchport access vlan {{ intf.vlan }}
+{% else %}
+interface {{ intf.interface }}
+  switchport mode trunk
+exit
+exit
+copy run start
+{% endif %}
+
+--------------------- VLAN Configuration using ANSIBLE MODULES  -----------------------------------------
+
 
 
 
