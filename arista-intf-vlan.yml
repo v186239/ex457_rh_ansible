@@ -1,0 +1,33 @@
+---
+
+- name: "vlans interface CONFIGS Playbook via MODULES"
+  hosts: usa
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista ACCESS ports for vlans"
+      arista.eos.eos_l2_interfaces:
+        config:
+        - name: "{{ item.interface }}"
+          mode: access
+          access:
+            vlan: "{{ item.vlan }}"
+        state: merged
+      register: arista_output
+      loop: "{{ vlans.interfaces }}"
+      when: item.mode == "access" and "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Configure Arista TRUNK ports for vlans"
+      arista.eos.eos_l2_interfaces:
+        config:
+        - name: "{{ item.interface }}"
+          mode: trunk
+        state: merged
+      register: arista_output
+      loop: "{{ vlans.interfaces }}"
+      when: item.mode == "trunk" and "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista L2 Interface vlans Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"

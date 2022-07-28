@@ -1582,9 +1582,148 @@ copy run start
 --------------------- VLAN Configuration using ANSIBLE MODULES  -----------------------------------------
 
 
+Arista EOS VLANS module
+https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_vlans_module.html#ansible-collections-arista-eos-eos-vlans-module
+
+Arista EOS L2 Interfaces module used to specify mode access or trunk ports
+https://docs.ansible.com/ansible/latest/collections/arista/eos/eos_l2_interfaces_module.html#ansible-collections-arista-eos-eos-l2-interfaces-module
+
+Cisco IOS VLANS Module
+https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_vlans_module.html#ansible-collections-cisco-ios-ios-vlans-module
+
+Cisco IOS L2 Interfaces module used to specify mode access or trunk ports
+https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_l2_interfaces_module.html#ansible-collections-cisco-ios-ios-l2-interfaces-module
+
+VyOS VLANS Module
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_vlan_module.html#ansible-collections-vyos-vyos-vyos-vlan-module
 
 
 
+Be careful when configuring the state of a VLAN.  The Overide option can remove vlans and cause outages.
 
+Arista VLAN module playbook
+---
+
+- name: "vlans CONFIGS Playbook via MODULES"
+  hosts: usa
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista vlans"
+      arista.eos.eos_vlans:
+        config:
+        - name: MGMT_EVENG
+          vlan_id: 1
+          state: active
+        - name: FIVE
+          vlan_id: 5
+          state: active
+        - name: TEN
+          vlan_id: 10
+          state: active
+        # state: overridden  # this statement will remove any VLANS not listed in this playbook
+         state: merged
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+ 
+    
+    - name: "Print Arista vlans Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+
+Arista L2 Interface Module playbook
+---
+
+- name: "vlans interface CONFIGS Playbook via MODULES"
+  hosts: usa
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista ACCESS ports for vlans"
+      arista.eos.eos_l2_interfaces:
+        config:
+        - name: "{{ item.interface }}"
+          mode: access
+          access:
+            vlan: "{{ item.vlan }}"
+        state: merged
+      register: arista_output
+      loop: "{{ vlans.interfaces }}"
+      when: item.mode == "access" and "ansible_network_os == 'arista.eos.eos'"
+
+    - name: "Configure Arista TRUNK ports for vlans"
+      arista.eos.eos_l2_interfaces:
+        config:
+        - name: "{{ item.interface }}"
+          mode: trunk
+        state: merged
+      register: arista_output
+      loop: "{{ vlans.interfaces }}"
+      when: item.mode == "trunk" and "ansible_network_os == 'arista.eos.eos'"
+    
+    - name: "Print Arista L2 Interface vlans Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+VyOS VLAN Module playbook
+
+---
+
+- name: "vlans interface CONFIGS Playbook via MODULES"
+  hosts: vyos
+  connection: network_cli
+
+  tasks:
+    - name: "Configure vyos VLAN and ACCESS ports for vlans"
+      vyos.vyos.vyos_vlan:
+        vlan_id: 10
+        name: TEN
+        interfaces: eth3
+        state: present
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print vyos L2 Interface vlans Config"
+      debug:
+        msg: "{{ vyos_output }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+
+Note with VYOS you can also use the aggregate key word to provide a list of vlans and interfaces
+aggregate 
+list / elements=dictionary
+List of VLANs definitions.
+
+---
+
+- name: "vlans interface CONFIGS Playbook via MODULES"
+  hosts: vyos
+  connection: network_cli
+
+  tasks:
+    - name: "Configure vyos VLAN and ACCESS ports for vlans"
+      vyos.vyos.vyos_vlan:
+        aggregate:
+          - vlan_id: 10
+            name: TEN
+            interfaces: eth1
+            state: present
+          - vlan_id: 33
+            name: THIRTYTHREE
+            interfaces: eth2
+            state: present
+          - vlan_id: 42
+            name: FORTYTWO
+            interfaces: eth3
+            state: present
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print vyos L2 Interface vlans Config"
+      debug:
+        msg: "{{ vyos_output }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
 
 

@@ -1,0 +1,20 @@
+---
+
+- name: "vlans interface CONFIGS Playbook via MODULES"
+  hosts: vyos
+  connection: network_cli
+
+  tasks:
+    - name: "Configure vyos VLAN and ACCESS ports for vlans"
+      vyos.vyos.vyos_vlan:
+        vlan_id: 10
+        name: TEN
+        interfaces: eth3
+        state: present
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print vyos L2 Interface vlans Config"
+      debug:
+        msg: "{{ vyos_output }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"

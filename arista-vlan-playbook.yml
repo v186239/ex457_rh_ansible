@@ -1,0 +1,29 @@
+---
+
+- name: "vlans CONFIGS Playbook via MODULES"
+  hosts: usa
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Arista vlans"
+      arista.eos.eos_vlans:
+        config:
+        - name: MGMT_EVENG
+          vlan_id: 1
+          state: active
+        - name: FIVE
+          vlan_id: 5
+          state: active
+        - name: TEN
+          vlan_id: 10
+          state: active
+        # state: overridden  # this statement will remove any VLANS not listed in this playbook
+        state: merged
+      register: arista_output
+      when: "ansible_network_os == 'arista.eos.eos'"
+ 
+    
+    - name: "Print Arista vlans Config"
+      debug:
+        msg: "{{ arista_output }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
