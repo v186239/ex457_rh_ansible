@@ -1727,3 +1727,51 @@ List of VLANs definitions.
       when: "ansible_network_os == 'vyos.vyos.vyos'"
 
 
+# NAPALM-Ansible
+
+--------------------- Understanding NAPALM-----------------------------------------
+
+In previous sessions we were able to configure OSPF, BGP and VLANS in a multivendor environment using ansible playbooks.
+
+Multivendor environments can be tricky.   Different CLI and connection methods.
+
+Enemy of automation is uniqueness.  The more uniqueness the less repeatable they are and it makes it harder to configure with automation.
+
+This skill will focus on a tool called NAPALM for use within Ansible.
+
+NAPALM (Python Library) = Network Automation and Programmability Abstraction Layer with Multivendor support
+
+https://napalm.readthedocs.io/en/latest/
+
+NAPALM will abstract the configuration commands between multiple vendors.  Using the exact same command!  
+
+Supported "CORE PLATFORM" Network Operating Systems:
+Arista EOS
+Cisco IOS  
+Cisco IOS-XR
+Cisco NX-OS
+Juniper JunOS 
+
+VYOS is not Supported with NAPALM.
+
+NAPALM will normalize data when the vendor CLI commands are different.  
+
+NAPALM can REPLACE and MERGE configuration.
+
+NAPALM allows ROLLBACK.
+
+NAPALM uses a GETTER to pull data from a device, translate, and return normalized data.
+
+Example:  the get-vlan, get-interfaces will pull vlan and interface information from Cisco, Arista, Juniper and return the same data.
+
+We want things as cookie cutter as possible and this is what NAPALM can do for us.
+
+
+--------------------- Installing Arista Images on EVE-NG ----------------------------------------
+
+
+
+
+
+
+
