@@ -1816,7 +1816,17 @@ On your linux machine:
 
 ansible-galaxy collection install arista.eos
 
+Create a virtual pip env
+
+python3 -m venv .venv
+
+cd .venv/
+
+source bin/activate
+
 pip3 install napalm
+or 
+pip3 install --ignore-installed PyYAML
 
 Here is the important part we need to git clone napalm-ansible
 
@@ -1829,7 +1839,7 @@ git clone https://github.com/napalm-automation/napalm-ansible.git
 Now you want to point ansible to this napalm-ansible installation
 
 Edit your ansible.cfg file and add this with your relative path
-library =$HOME/root/ex457_rh_ansible/Network-Automation/napalm-ansible
+library =$HOME/ex457_rh_ansible/Network-Automation/napalm-ansible
 
 In order to interact with our ARISTA devices NAPALM is not going to try ssh instead it's going to eAPI on Arista so we need to enable it.
 
@@ -1864,6 +1874,40 @@ EDIT YOUR GROUP VARS AND ADD THIS VARIABLE IN YOUR arista and cisco group vars
 napalm_platform: "eos"
 
 napalm_platform: "ios"
+
+
+--------------------- Retrieving State informion from devices with NAPALM Getters ----------------------------------------
+
+Let's create a playbook to get facts from devices
+
+NAPALM MODULES CAN BE FOUND ON THEIR WEBSITE
+https://napalm.readthedocs.io/en/latest/tutorials/ansible-napalm.html#modules
+
+napalm_get_facts
+
+napalm_install_config
+
+napalm_validate
+
+---
+
+- name: "Playbook to test NAPALM ANSIBLE"
+  hosts: cisco, arista
+  connection: network_cli
+
+  tasks:
+    - name: "Retrieve devices facts via NAPALM"
+      napalm_get_facts:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+      
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result }}"
 
 
 
