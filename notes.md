@@ -1769,6 +1769,39 @@ We want things as cookie cutter as possible and this is what NAPALM can do for u
 
 --------------------- Installing Arista Images on EVE-NG ----------------------------------------
 
+Login into the Arista Website
+https://www.arista.com/en/support/software-download
+
+You will need an account to login.
+
+Download the following
+
+Aboot
+EOS Boot-loader files
+https://www.arista.com/custom_data/aws3-explorer/download-s3-file.php?f=/support/download/vEOS-lab/Aboot/Aboot-veos-serial-8.0.1.iso
+
+vEOS
+Virtual EOS vmdk files
+https://www.arista.com/custom_data/aws3-explorer/download-s3-file.php?f=/support/download/vEOS-lab/4.27/vEOS-lab-4.27.5M.vmdk
+
+Now that you have the two images you can add to your EVE-NG
+https://www.eve-ng.net/index.php/documentation/howtos/howto-add-arista-veos/
+
+Connect to your EVE-NG machine via ssh and copy files.
+
+Add an Arista node to your EVE-NG toplogy.
+
+Log into the Arista and run this command to disable zero touch provisioning (ZTP).
+
+zerotouch cancel
+
+copy run start
+--------------------- Installing NAPALM ANSIBLE ----------------------------------------
+
+
+
+
+
 
 
 
