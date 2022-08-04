@@ -1,0 +1,10 @@
+---
+
+ntp: "10.10.10.10"
+
+ospf:
+  rid: "3.3.3.3"
+
+super_secret_bgp: 1234
+
+ninja_ospf: "5"

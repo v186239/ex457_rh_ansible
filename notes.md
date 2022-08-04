@@ -1784,10 +1784,9 @@ vEOS
 Virtual EOS vmdk files
 https://www.arista.com/custom_data/aws3-explorer/download-s3-file.php?f=/support/download/vEOS-lab/4.27/vEOS-lab-4.27.5M.vmdk
 
-Now that you have the two images you can add to your EVE-NG
+Now that you have the two images you can add to your EVE-NG.
+Connect to your EVE-NG machine via ssh and copy files and follow these instructions.
 https://www.eve-ng.net/index.php/documentation/howtos/howto-add-arista-veos/
-
-Connect to your EVE-NG machine via ssh and copy files.
 
 Add an Arista node to your EVE-NG toplogy.
 
@@ -1796,13 +1795,75 @@ Log into the Arista and run this command to disable zero touch provisioning (ZTP
 zerotouch cancel
 
 copy run start
+
 --------------------- Installing NAPALM ANSIBLE ----------------------------------------
 
+To make things less clutered lets create a new directory.
 
+Create a new directory called Network-Automation and copy important files to it.
 
+root@eveng-2:~/ex457_rh_ansible# mkdir Network-Automation
+root@eveng-2:~/ex457_rh_ansible# cd Network-Automation
+root@eveng-2:~/ex457_rh_ansible/Network-Automation# cd ..
+root@eveng-2:~/ex457_rh_ansible# cp -r hosts ansible.cfg host_vars/ group_vars/ n
+notes.md        ntp-config.yml  nuggets/        
+root@eveng-2:~/ex457_rh_ansible# cp -r hosts ansible.cfg host_vars/ group_vars/ Network-Automation/
+root@eveng-2:~/ex457_rh_ansible# cd Network-Automation
+root@eveng-2:~/ex457_rh_ansible/Network-Automation# ls
+ansible.cfg  group_vars  host_vars  hosts
 
+On your linux machine:
 
+ansible-galaxy collection install arista.eos
 
+pip3 install napalm
+
+Here is the important part we need to git clone napalm-ansible
+
+Instructions
+https://napalm.readthedocs.io/en/latest/tutorials/ansible-napalm.html
+
+cd to your workspace directory
+git clone https://github.com/napalm-automation/napalm-ansible.git
+
+Now you want to point ansible to this napalm-ansible installation
+
+Edit your ansible.cfg file and add this with your relative path
+library =$HOME/root/ex457_rh_ansible/Network-Automation/napalm-ansible
+
+In order to interact with our ARISTA devices NAPALM is not going to try ssh instead it's going to eAPI on Arista so we need to enable it.
+
+On the Arista devices run the following commands
+
+conf t
+
+username api privilege 15 secret arista
+
+management api http-commands
+
+no shutdown
+
+On the Cisco devices run the following commands
+
+conf t
+
+username api privilege 15 secret cisco
+
+ip domain-name cisco.com
+
+ip ssh v 2
+
+crypto key gen rsa mod 1024
+
+line vty 0 15
+
+transport input ssh 
+
+EDIT YOUR GROUP VARS AND ADD THIS VARIABLE IN YOUR arista and cisco group vars
+
+napalm_platform: "eos"
+
+napalm_platform: "ios"
 
 
 

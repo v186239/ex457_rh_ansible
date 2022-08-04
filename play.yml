@@ -29,7 +29,7 @@
       ios_command:
         commands: 
           - show version | include uptime
-          - show ip interface brief
+          - show clock
       register: show_output
 
     - debug: var=show_output

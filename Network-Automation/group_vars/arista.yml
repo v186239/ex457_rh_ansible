@@ -1,0 +1,16 @@
+ansible_user: "admin"
+ansible_password: "qwerty"
+ansible_network_os: arista.eos.eos
+napalm_platform: "eos"
+
+ntp: "10.10.10.10"
+
+ospf:
+  rid: "3.3.3.3"
+  area: "0"
+  networks:
+    - "10.0.0.0 0.0.0.255"
+    - "192.168.1.0 0.0.0.255"
+    - "172.16.0.0 0.0.255.255"
+  redistributing:
+    bgp: "65001"

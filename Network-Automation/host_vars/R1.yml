@@ -1,0 +1,70 @@
+---
+
+ospf:
+ rid: 1.1.1.1
+ default_originate: true
+ networks:
+   - prefix: "10.1.2.0/30"
+     area: "0"
+   - prefix: "1.1.1.1/32"
+     area: "0"
+
+bgp:
+  asn: "1"
+  rid: "1.1.1.1"
+  neighbors:
+    - neighbor: "10.1.2.2"
+      peer_asn: "2"
+  networks:
+    - network: "99.99.99.99/32"
+    - network: "100.100.100.100/32"
+
+vlans:
+  interfaces:
+    - interface: "Et4"
+      mode: access
+      vlan: 5
+    - interface: "Et5"
+      mode: access
+      vlan: 10
+    - interface: "Et2"
+      mode: trunk
+  vlan:
+    - number: "5"
+      name: "FIVE"
+      svi: "192.168.5.1 255.255.255.0"
+    - number: "10"
+      name: "TEN"
+      svi: "192.168.10.1 255.255.255.0"
+
+      
+
+# bgp_style: bgp
+
+# BGP:
+#   ASN: "65001"
+#   peers: 
+#     - neighbor: 10.199.199.12
+#       peer_asn: "65002"
+
+#     - neighbor: 10.199.199.10
+#       peer_asn: "65010"
+
+#     - neighbor: 192.168.77.1
+#       peer_asn: "771"
+
+# ntp:
+#   servers:
+#     - 1.1.1.1
+#     - 2.2.2.2
+#     - 5.5.5.5
+
+# syslog:
+#   hosts:
+#     - ip: 1.1.1.1
+
+#     - ip: 2.2.2.2
+#       port: 1234
+
+#     - ip: 4.4.4.4
+#       port: 4567
