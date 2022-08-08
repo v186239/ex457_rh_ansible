@@ -1909,7 +1909,27 @@ napalm_validate
       debug:
         msg: "{{ result }}"
 
+ # Note for enabling Arista eAPI
 
+#####################################################################################
+ To ename eAPI for NAPALM on Arista you must no shutdown management api.
+ 
+ conf t
+ !
+management api http-commands
+   no shutdown
 
+Also on the Ansible Control node - you must modify your /etc/hosts file to include the DNS Name of your Arista devices.
+Otherwise you will get this Ansible ERROR MESSAGE.
 
+TASK [Retrieve devices facts via NAPALM] 
+fatal: [R1]: FAILED! => {
+    "changed": false
+}
+MSG:
+cannot connect to device: Socket error during eAPI connection: [Errno -3] Temporary failure in name resolution
 
+vi /etc/hosts
+R1 10.199.199.11
+
+#####################################################################################
