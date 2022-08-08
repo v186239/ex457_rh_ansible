@@ -1933,3 +1933,48 @@ vi /etc/hosts
 R1 10.199.199.11
 
 #####################################################################################
+
+Napalm Getters
+
+https://napalm.readthedocs.io/en/latest/support/
+
+
+get_interfaces_ip
+get_interfaces_counters
+get_mac_address_table
+
+EXAMPLE 2 PLAYBOOK WITH A FILTER
+---
+
+- name: "Playbook to test NAPALM ANSIBLE"
+  hosts: cisco, arista
+  connection: network_cli
+
+  tasks:
+    - name: "Retrieve devices facts via NAPALM"
+      napalm_get_facts:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        # filter: ["interfaces_ip"]
+        # filter: ["interfaces_counters"]
+        # filter: ["mac_address_table"]
+        # You can chain your napalm fiters using a comma
+        filter: ["interfaces_counters", "mac_address_table"]
+      
+      register: result
+
+    - name: "Print Result"
+      debug:
+        # msg: "{{ result.ansible_facts.napalm_mac_address_table[0].mac }}"
+        # msg: "{{ result.ansible_facts.napalm_mac_address_table }}"
+        msg: "{{ result.ansible_facts.napalm_interfaces_counters.Management1.tx_errors }}"
+      when: "ansible_network_os == 'arista.eos.eos'"
+
+##########################################################################################################
+
+# Validating Configurations and State
+
+
+  
