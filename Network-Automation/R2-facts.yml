@@ -1,0 +1,6 @@
+---
+- get_facts:
+    hostname: R2
+    model: vEOS
+    serial_number: ''
+    vendor: Arista

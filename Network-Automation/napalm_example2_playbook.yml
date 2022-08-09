@@ -23,5 +23,5 @@
       debug:
         # msg: "{{ result.ansible_facts.napalm_mac_address_table[0].mac }}"
         # msg: "{{ result.ansible_facts.napalm_mac_address_table }}"
-        msg: "{{ result.ansible_facts.napalm_interfaces_counters.Management1.tx_errors }}"
+        msg: "{{ result.ansible_facts.napalm_interfaces_counters.Management1.tx_errors | to_nice_json }}"
       when: "ansible_network_os == 'arista.eos.eos'"

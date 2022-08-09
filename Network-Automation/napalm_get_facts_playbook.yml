@@ -11,9 +11,12 @@
         username: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
         dev_os: "{{ napalm_platform }}"
+        filter: ["facts"]
       
       register: result
 
     - name: "Print Result"
       debug:
-        msg: "{{ result | to_nice_json }}"
+        msg: "{{ result.ansible_facts.napalm_facts | to_yaml(indent=8, width=1337) }}"
+        # msg: "{{ result.ansible_facts.napalm_facts | to_nice_json  }}"
+        

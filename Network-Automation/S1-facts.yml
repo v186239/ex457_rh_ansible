@@ -1,0 +1,6 @@
+---
+- get_facts:
+    hostname: csr1000v-1
+    model: CSR1000V
+    serial_number: 9ESGOBARV9D
+    vendor: Cisco

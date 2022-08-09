@@ -1,19 +1,20 @@
 ---
 
-- name: "Playbook to test NAPALM ANSIBLE"
-  hosts: cisco, arista
+- name: "NAPALM PLAYBOOK TO VALIDATE DEVICES"
+  hosts: arista, cisco
   connection: network_cli
 
   tasks:
-    - name: "Retrieve devices facts via NAPALM"
-      napalm_get_facts:
+    - name: " Task1 - use NAPALM VALIDATE "
+      napalm_validate:
         hostname: "{{ inventory_hostname }}"
         username: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
         dev_os: "{{ napalm_platform }}"
-      
+        validation_file: "{{ inventory_hostname}}-facts.yml"
       register: result
+      ignore_errors: yes
 
-    - name: "Print Result"
+    - name: "Task1 - print the result"
       debug:
         msg: "{{ result | to_nice_json }}"

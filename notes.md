@@ -1974,7 +1974,126 @@ EXAMPLE 2 PLAYBOOK WITH A FILTER
 
 ##########################################################################################################
 
-# Validating Configurations and State
+# Validating Configurations and State using napalm_validate
+
+We are going to be using NAPALM validate to validate our configs.
+
+Introduce aliases into inventory file.
+S1 ansible_host=10.199.199.11
+S2 ansible_host=10.199.199.12
+
+Create a "napalm_get_facts_playbook.yml" playbook that filters on facts
+
+---
+
+- name: "Playbook to test NAPALM ANSIBLE"
+  hosts: cisco, arista
+  connection: network_cli
+
+  tasks:
+    - name: "Retrieve devices facts via NAPALM"
+      napalm_get_facts:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        filter: ["facts"]
+      
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result.ansible_facts.napalm_facts | to_yaml(indent=8, width=1337) }}"
+        # msg: "{{ result.ansible_facts.napalm_facts | to_nice_json  }}"
+
+Grab the results of the napalm facts and convert it from json to yaml.  Or use the | to_yaml filter with debug msg.
+
+Go to https://www.json2yaml.com/
+
+Create {{ inventory_hostname }}-facts.yml files and paste the yaml output results from napalm_get_facts playbook above.
+
+Remove any key:value pair items in the list you don't need to validate. 
+
+The valutes in this {{ inventory_hostname }}-facts.yml will be used with the napalm_example3_playbook.yml to validate configuration compliancy.
+
+Modify the {{ inventory_hostname }}-facts.yml to reference the entire name of get_facts NAPALM getter
+https://napalm.readthedocs.io/en/latest/support/index.html#getters-support-matrix
+
+Example:  R1-facts.yml
+---
+- get_facts:
+    hostname: R1
+    model: vEOS
+    serial_number: ''
+    vendor: Arista
+
+######################################################################################################################################################
+Example Playbook "napalm_example3_playbook.yml" that validates compliance of facts based on data in the {{ inventory_hostname}}-facts.yml File.
+
+---
+
+- name: "NAPALM PLAYBOOK TO VALIDATE DEVICES"
+  hosts: arista, cisco
+  connection: network_cli
+
+  tasks:
+    - name: " Task1 - use NAPALM VALIDATE "
+      napalm_validate:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        validation_file: "{{ inventory_hostname}}-facts.yml"
+      register: result
+      ignore_errors: yes
+
+    - name: "Task1 - print the result"
+      debug:
+        msg: {{ result }}
+
+Run the ansible-playbook napalm_example3_playbook.yml 
+
+If configuration data is compliant the task for that device will show complies: true.
+
+{
+    "changed": false,
+    "compliance_report": {
+        "complies": true,
+        "get_facts": {
+            "complies": true,
+            "extra": [],
+            "missing": [],
+            "present": {
+                "hostname": {
+                    "complies": true,
+                    "nested": false
+                },
+                "model": {
+                    "complies": true,
+                    "nested": false
+                },
+                "serial_number": {
+                    "complies": true,
+                    "nested": false
+                },
+                "vendor": {
+                    "complies": true,
+                    "nested": false
+                }
+
+If configuration data is NOT compliant the task for that device will show complies: false along with actual vs expected value
+                "hostname": {
+                    "actual_value": "R1",
+                    "complies": false,
+                    "expected_value": "R20",
+                    "nested": false
+                    
+# Validatiion Troubleshooting using napalm_validate
+
+
+
+
+
 
 
   
