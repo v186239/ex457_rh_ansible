@@ -4,3 +4,50 @@
     model: vEOS
     serial_number: ''
     vendor: Arista
+
+---
+ansible_facts:
+  napalm_lldp_neighbors_detail:
+    Ethernet1:
+    - parent_interface: Ethernet1
+      remote_chassis_id: 50:00:00:D5:5D:C0
+      remote_port: Ethernet2
+      remote_port_description: ''
+      remote_system_capab:
+      - bridge
+      - router
+      remote_system_description: Arista Networks EOS version 4.20.8M running on an
+        Arista Networks vEOS
+      remote_system_enable_capab:
+      - bridge
+      remote_system_name: switch.cisco.com
+    Ethernet2:
+    - parent_interface: Ethernet2
+      remote_chassis_id: 50:00:00:CB:38:C2
+      remote_port: Ethernet2
+      remote_port_description: ''
+      remote_system_capab:
+      - bridge
+      - router
+      remote_system_description: Arista Networks EOS version 4.20.8M running on an
+        Arista Networks vEOS
+      remote_system_enable_capab:
+      - bridge
+      - router
+      remote_system_name: R2.arista.com
+    Ethernet3:
+    - parent_interface: Ethernet3
+      remote_chassis_id: 50:00:00:04:00:00
+      remote_port: eth3
+      remote_port_description: Configured by Will using Ansible
+      remote_system_capab:
+      - bridge
+      - router
+      - station
+      - wlan-access-point
+      remote_system_description: VyOS 1.4-rolling-202207111030
+      remote_system_enable_capab:
+      - router
+      remote_system_name: R3-yos
+changed: false
+failed: false

@@ -1,0 +1,21 @@
+---
+
+- name: "Playbook to test NAPALM ANSIBLE"
+  hosts: cisco, arista
+  connection: network_cli
+
+  tasks:
+    - name: "Retrieve devices facts via NAPALM"
+      napalm_get_facts:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        # filter: ["config" , "lldp_neighbors_detail"]
+        filter: ["lldp_neighbors_detail"]
+      
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result.ansible_facts.napalm_lldp_neighbors_detail | to_nice_json }}"
