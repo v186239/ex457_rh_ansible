@@ -1816,6 +1816,10 @@ On your linux machine:
 
 ansible-galaxy collection install arista.eos
 
+pip install napalm
+
+or
+
 Create a virtual pip env
 
 python3 -m venv .venv
