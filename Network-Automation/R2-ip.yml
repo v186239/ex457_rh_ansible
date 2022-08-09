@@ -1,0 +1,7 @@
+---
+
+- get_interfaces_ip:
+    Ethernet1:
+      ipv4:
+        10.199.199.12:
+          prefix_length: 24

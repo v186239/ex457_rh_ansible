@@ -1,0 +1,7 @@
+---
+
+- get_interfaces_ip:
+    GigabitEthernet1:
+      ipv4:
+        10.10.20.48:
+          prefix_length: 24

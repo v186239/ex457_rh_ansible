@@ -1972,6 +1972,8 @@ EXAMPLE 2 PLAYBOOK WITH A FILTER
         msg: "{{ result.ansible_facts.napalm_interfaces_counters.Management1.tx_errors }}"
       when: "ansible_network_os == 'arista.eos.eos'"
 
+https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#formatting-data-yaml-and-json
+
 ##########################################################################################################
 
 # Validating Configurations and State using napalm_validate
@@ -2087,13 +2089,164 @@ If configuration data is NOT compliant the task for that device will show compli
                     "complies": false,
                     "expected_value": "R20",
                     "nested": false
-                    
+
 # Validatiion Troubleshooting using napalm_validate
 
+There are some caviates that we have to do.
 
 
+Create a "napalm_example_getvlans_playbook.yml" playbook that filters on facts
+
+---
+
+- name: "Playbook to test NAPALM ANSIBLE"
+  hosts: cisco, arista
+  connection: network_cli
+
+  tasks:
+    - name: "Retrieve devices facts via NAPALM"
+      napalm_get_facts:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        # filter: ["interfaces_ip"]
+        # filter: ["interfaces_counters"]
+        # filter: ["mac_address_table"]
+        # You can chain your napalm fiters using a comma
+        filter: ["vlans"]
+      
+      register: result
+
+    - name: "Print Result"
+      debug:
+        # msg: "{{ result.ansible_facts.napalm_mac_address_table[0].mac }}"
+        # msg: "{{ result.ansible_facts.napalm_mac_address_table }}"
+        msg: "{{ result.ansible_facts.napalm_vlans | to_nice_json }}"
+      # when: "ansible_network_os == 'arista.eos.eos'"
 
 
+Grab the results of the napalm facts and convert it from json to yaml.  Or use the | to_yaml filter with debug msg.
 
+Go to https://www.json2yaml.com/
 
+Create {{ inventory_hostname }}-facts.yml files and paste the yaml output results from napalm_get_facts playbook above.
+
+Remove any key:value pair items in the list you don't need to validate. 
+
+The valutes in this {{ inventory_hostname }}-facts.yml will be used with the napalm_example3_playbook.yml to validate configuration compliancy.
+
+Modify the {{ inventory_hostname }}-facts.yml to reference the entire name of get_facts NAPALM getter
+
+######################################################################################################################################################
+Example Playbook "napalm_example3c_vlans_playbook.yml" that validates compliance of facts based on data in the {{ inventory_hostname}}-facts.yml File.
+---
+
+- name: "NAPALM PLAYBOOK TO VALIDATE DEVICES"
+  hosts: arista, cisco
+  connection: network_cli
+
+  tasks:
+    - name: " Task1 - use NAPALM VALIDATE "
+      napalm_validate:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        validation_file: "{{ inventory_hostname}}-vlan.yml"
+      register: result
+      ignore_errors: yes
+
+    - name: "Task1 - print the result"
+      debug:
+        msg: "{{ result | to_nice_json }}"
+
+Run the ansible-playbook napalm_example3c_vlans_playbook.yml
+
+If configuration data is compliant the task for that device will show complies: true.
   
+################ GOCHAS There are some caviates that we have to do #######################################
+
+https://napalm.readthedocs.io/en/latest/validate/index.html
+
+Lists of objects to be validated require an extra key list. You can see an example with the get_facts getter. Lists can be strict as well. In this case, we want to make sure the device has only those two interfaces.
+
+What this means is we have to modify our validation {{ inventory_hostname }}-facts.yml file with a new "list" object
+Edit the R1-vlan.yml
+---
+- get_vlans:
+    '1':
+      interfaces:
+        list:
+          - Ethernet2
+          - Ethernet3
+          - Ethernet6
+          - Ethernet7
+      name: default
+    '5':
+      interfaces:
+        list:
+          - Ethernet2
+          - Cpu
+          - Ethernet4
+      name: FIVE
+    '10':
+      interfaces:
+        list:
+          - Ethernet2
+          - Cpu
+          - Ethernet5
+      name: TEN
+
+If configuration data is NOT compliant the task for that device will show complies: fail.
+Device does not comply with policy
+...ignoring
+ok: [R2]
+
+TASK [Task1 - print the result] **************************************************************************************************************************************************************************************************
+ok: [R1] => {}
+MSG:
+{
+    "changed": false,
+    "compliance_report": {
+        "complies": false,
+        "get_vlans": {
+            "complies": false,
+            "extra": [],
+            "missing": [],
+            "present": {
+                "1": {
+                    "complies": true,
+                    "nested": true
+                },
+                "10": {
+                    "complies": true,
+                    "nested": true
+                },
+                "5": {
+                    "complies": false,
+                    "diff": {
+                        "complies": false,
+                        "extra": [],
+                        "missing": [],
+                        "present": {
+                            "interfaces": {
+                                "complies": false,
+                                "diff": {
+                                    "complies": false,
+                                    "extra": [],
+                                    "missing": [
+                                        "Ethernet3"
+                                    ],
+                                    "present": [
+                                        "Ethernet2",
+                                        "Cpu",
+                                        "Ethernet4"
+
+    "failed": true,
+    "msg": "Device does not comply with policy"
+
+
+  # Backup and Restore Configurations
+
+  Mundane....
