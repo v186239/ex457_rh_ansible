@@ -2215,14 +2215,6 @@ MSG:
             "extra": [],
             "missing": [],
             "present": {
-                "1": {
-                    "complies": true,
-                    "nested": true
-                },
-                "10": {
-                    "complies": true,
-                    "nested": true
-                },
                 "5": {
                     "complies": false,
                     "diff": {
@@ -2237,12 +2229,6 @@ MSG:
                                     "extra": [],
                                     "missing": [
                                         "Ethernet3"
-                                    ],
-                                    "present": [
-                                        "Ethernet2",
-                                        "Cpu",
-                                        "Ethernet4"
-
     "failed": true,
     "msg": "Device does not comply with policy"
 
