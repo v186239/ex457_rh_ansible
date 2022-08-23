@@ -2239,4 +2239,24 @@ MSG:
 
   # Backup and Restore Configurations
 
-  Mundane....
+--------------------- INTRODUCTION -----------------------------
+  Mundane or cookie cutter tasks are repetative.
+
+  One of the most common things to do is to backup your configuration typically done by logging into a device and running "show run" command.
+
+  We are going to learn about backing up configuration using Ansible Automation.
+
+  Which can be done on a scheduled basis like at 7am every morning.
+
+  If something goes wrong during a change how do you restore the configuration?  
+
+  We are going to backup and restore configuration using ansible modules.
+
+  It's also important to have a log, date and time of the device.
+-----------------------------------------------------------------
+
+--------------------- USING THE SETUP MODULE -----------------------------
+
+
+
+
