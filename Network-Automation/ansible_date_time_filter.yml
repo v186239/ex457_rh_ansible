@@ -1,0 +1,19 @@
+---
+- name: "TEST SETUP MODULE PLAYBOOK"
+  hosts: localhost
+
+  tasks:
+    - name: "Collect facts aobut local host"
+      ansible.builtin.setup:
+        filter:
+          - "ansible_date_time"
+      register: output
+
+    - name: "Task2: Recording Variable as a fact"
+      set_fact:
+        datetime: "{{ ansible_date_time }}"
+
+    - name: "Print facts from local host min"
+      debug:
+        # msg: "{{ datetime.date | to_nice_json }}"
+        msg: "{{ datetime.iso8601 | to_nice_json }}"

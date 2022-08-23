@@ -2257,6 +2257,56 @@ MSG:
 
 --------------------- USING THE SETUP MODULE -----------------------------
 
+ANSIBLE SETUP MODULE
+https://docs.ansible.com/ansible/latest/collections/ansible/builtin/setup_module.html
+
+This module is automatically called by playbooks to gather useful variables about remote hosts that can be used in playbooks. It can also be executed directly by /usr/bin/ansible to check what variables are available to a host. Ansible provides many facts about the system, automatically.
+
+The first thing you want to do is to get the date and time from the local ansible host and register it as an output variable.
+
+---
+- name: "TEST SETUP MODULE PLAYBOOK"
+  hosts: localhost
+
+  tasks:
+    - name: "Collect facts aobut local host"
+      ansible.builtin.setup:
+        gather_subset:
+          - "min"
+      register: output
+
+    - name: "Print facts from local host min"
+      debug:
+        # msg: "{{ output.ansible_facts.ansible_date_time.iso8601 | to_nice_json }}"
+        msg: "{{ output.ansible_facts.ansible_date_time.date | to_nice_json }}"
+
+You can also use the filter ansible_date_time to get the local date and time information and then set a fact to save this varialbe for use with another task.
+
+---
+- name: "TEST SETUP MODULE PLAYBOOK"
+  hosts: localhost
+
+  tasks:
+    - name: "Collect facts aobut local host"
+      ansible.builtin.setup:
+        filter:
+          - "ansible_date_time"
+      register: output
+
+    - name: "Task2: Recording Variable as a fact"
+      set_fact:
+        datetime: "{{ ansible_date_time }}"
+
+    - name: "Print facts from local host min"
+      debug:
+        # msg: "{{ datetime.date | to_nice_json }}"
+        msg: "{{ datetime.iso8601 | to_nice_json }}"
+        
+------------------------------------------------------------------------------
+
+
+--------------------- CREATING DIRECTORIES WITH THE FILE MODULE -----------------------------
+
 
 
 
