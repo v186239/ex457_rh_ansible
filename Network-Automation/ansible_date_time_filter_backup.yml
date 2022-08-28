@@ -45,6 +45,16 @@
         state: directory
       run_once: true
 
+    - name: "Task 4 of Play2: Copy Startup configs to disk"
+      copy:
+        content: "{{ result.ansible_facts.napalm_config.startup }}"
+        dest: "Backups/{{ hostvars.localhost.datetime}}/startup-configs/{{ inventory_hostname }}-startup-config.txt"
+
+    - name: "Task 5 of Play2: Copy Startup configs to disk"
+      copy:
+        content: "{{ result.ansible_facts.napalm_config.running }}"
+        dest: "Backups/{{ hostvars.localhost.datetime}}/running-configs/{{ inventory_hostname }}-running-config.txt"
+
     - name: "Print result"
       debug:
         msg: "{{ result | to_nice_json }}"

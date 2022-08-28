@@ -1,0 +1,91 @@
+! Command: show startup-config
+! Startup-config last modified at  Mon Aug  8 15:38:48 2022 by admin
+! device: R1 (vEOS, EOS-4.20.8M)
+!
+! boot system flash:/vEOS-lab.swi
+!
+transceiver qsfp default-mode 4x10G
+!
+hostname R1
+ip domain-name arista.com
+!
+spanning-tree mode mstp
+!
+aaa authentication login console local
+aaa authorization exec default local
+!
+aaa root secret sha512 $6$FaOn9teb2NJNORSB$hl8JogSW5g8qtt5MdtWzvLso0Cf4La4I7owo4BkLfVeg/YPOKujs/IfkEwjVI76SARb2nGXJjGGi/h8JWH5111
+aaa authentication policy local allow-nopassword-remote-login
+!
+username admin privilege 15 role network-admin secret sha512 $6$ogOR8jFMBVP9sWbM$P3HsIFimChSWv2xK5l.FhKVXJwKIrM9JjpyUXuBzU.sMRdoKrF.QgDCppuzMdHaTZUpPn.8KpMzXQC0RKXh4W/
+!
+vlan 5
+   name FIVE
+!
+vlan 10
+   name TEN
+!
+interface Ethernet1
+   description Configured by Will Ansible
+   no switchport
+   ip address 10.199.199.11/24
+!
+interface Ethernet2
+   switchport mode trunk
+!
+interface Ethernet3
+!
+interface Ethernet4
+   switchport access vlan 5
+!
+interface Ethernet5
+   switchport access vlan 10
+!
+interface Ethernet6
+!
+interface Ethernet7
+!
+interface Ethernet8
+   no switchport
+   ip address 10.0.0.1/30
+!
+interface Loopback0
+   ip address 1.1.1.1/32
+!
+interface Loopback99
+   ip address 99.99.99.99/32
+!
+interface Loopback100
+   ip address 100.100.100.100/32
+!
+interface Management1
+   ip address 192.168.56.10/24
+!
+interface Vlan5
+   ip address 192.168.5.1/24
+!
+interface Vlan10
+   ip address 192.168.10.1/24
+!
+ip route 0.0.0.0/0 10.199.199.1
+!
+ip routing
+!
+router bgp 1
+   router-id 1.1.1.1
+   neighbor 10.1.2.2 remote-as 2
+   neighbor 10.1.2.2 maximum-routes 12000 
+   network 99.99.99.99/32
+   network 100.100.100.100/32
+!
+router ospf 1
+   router-id 1.1.1.1
+   network 1.1.1.1/32 area 0.0.0.0
+   network 10.1.2.0/30 area 0.0.0.0
+   max-lsa 12000
+   default-information originate
+!
+management api http-commands
+   no shutdown
+!
+end

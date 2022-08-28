@@ -1,0 +1,91 @@
+! Command: show running-config
+! device: R2 (vEOS, EOS-4.20.8M)
+!
+! boot system flash:/vEOS-lab.swi
+!
+transceiver qsfp default-mode 4x10G
+!
+hostname R2
+ip domain-name arista.com
+!
+spanning-tree mode mstp
+!
+aaa authentication login console local
+aaa authorization exec default local
+!
+aaa root secret sha512 $6$FaOn9teb2NJNORSB$hl8JogSW5g8qtt5MdtWzvLso0Cf4La4I7owo4BkLfVeg/YPOKujs/IfkEwjVI76SARb2nGXJjGGi/h8JWH5111
+aaa authentication policy local allow-nopassword-remote-login
+!
+username admin privilege 15 role network-admin secret sha512 $6$fclZoIKIQxDpg6mR$wTRwRv199ilkNI4J8yj5nyLXkl/FK3DKVrNxX7jabObrAy2yaueysbE1GLOyVxr5JcgVRmTYkwxZc6fjHx7qU0
+!
+vlan 5
+   name FIVE
+!
+vlan 10
+   name TEN
+!
+interface Ethernet1
+   description Configured by Will Ansible
+   no switchport
+   ip address 10.199.199.12/24
+!
+interface Ethernet2
+   switchport mode trunk
+!
+interface Ethernet3
+   no switchport
+   ip address 10.2.3.1/30
+!
+interface Ethernet4
+   no switchport
+   ip address 10.2.4.1/30
+!
+interface Ethernet5
+   switchport access vlan 10
+!
+interface Ethernet6
+   switchport access vlan 5
+!
+interface Ethernet7
+!
+interface Ethernet8
+   no switchport
+   ip address 10.0.0.2/30
+!
+interface Loopback0
+   ip address 2.2.2.2/32
+!
+interface Management1
+   ip address 192.168.56.10/24
+!
+interface Vlan5
+   ip address 192.168.5.2/24
+!
+interface Vlan10
+   ip address 192.168.10.2/24
+!
+ip route 0.0.0.0/0 10.199.199.1
+!
+ip routing
+!
+router bgp 2
+   router-id 2.2.2.2
+   neighbor 10.1.2.1 remote-as 1
+   neighbor 10.1.2.1 maximum-routes 12000 
+   neighbor 10.2.3.2 remote-as 3
+   neighbor 10.2.3.2 maximum-routes 12000 
+   neighbor 10.2.4.2 remote-as 4
+   neighbor 10.2.4.2 maximum-routes 12000 
+!
+router ospf 1
+   router-id 2.2.2.2
+   network 2.2.2.2/32 area 0.0.0.0
+   network 10.1.2.0/30 area 0.0.0.0
+   network 10.2.3.0/30 area 0.0.0.0
+   network 10.2.4.0/30 area 0.0.0.0
+   max-lsa 12000
+!
+management api http-commands
+   no shutdown
+!
+end
