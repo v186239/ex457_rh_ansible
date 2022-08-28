@@ -2307,6 +2307,44 @@ You can also use the filter ansible_date_time to get the local date and time inf
 
 --------------------- CREATING DIRECTORIES WITH THE FILE MODULE -----------------------------
 
+Ansible to be able to create a new directory based on today's date.
+
+Within that new directory store backups.
+
+Ansible File module.
+https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html
+
+path will create directory.
+
+state (default file) if you change to directory all intermediate subdirectories will be created.
+
+run_once is a Boolean true or false force the task to attempt to execute on the first host available and afterwards apply any results and facts to all active hosts in the same batch.
+
+Example Playbook:
+
+---
+- name: "TEST SETUP MODULE PLAYBOOK"
+  hosts: localhost
+
+  tasks:
+    - name: "Collect facts aobut local host"
+      ansible.builtin.setup:
+        filter:
+          - "ansible_date_time"
+      register: output
+
+    - name: "Task2: Recording Variable as a fact"
+      set_fact:
+        datetime: "{{ ansible_date_time.date }}"
+
+    - name: "Task3 - Creating directories with file module"
+      file:
+        path:  "Backups/{{ datetime }}"
+        state: directory
+      run_once: true
+
+
+
 
 
 
