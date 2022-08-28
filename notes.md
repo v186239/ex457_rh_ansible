@@ -2343,6 +2343,74 @@ Example Playbook:
         state: directory
       run_once: true
 
+--------------------- Startup and Running Configurations -----------------------------
+
+Storing running configurations using ansible and NAPALM.
+
+NAPALM get_config getters will get running and startup configs for multiple vendors.
+https://napalm.readthedocs.io/en/latest/support/
+
+Example Playbook with multiple plays:
+
+---
+- name: "Play 1: TEST SETUP MODULE PLAYBOOK"
+  hosts: localhost
+
+  tasks:
+    - name: "Task1 of Play 1: Collect facts aobut local host"
+      ansible.builtin.setup:
+        filter:
+          - "ansible_date_time"
+      register: output
+
+    - name: "Task2 of Play 1: Recording Variable as a fact"
+      set_fact:
+        datetime: "{{ ansible_date_time.date }}"
+
+    - name: "Task3 of Play 1: Creating directories with file module"
+      file:
+        path:  "Backups/{{ datetime }}"
+        state: directory
+      run_once: true
+
+- name: "Play 2: Backing up Configurations"
+  hosts: arista
+  connection: network_cli
+
+  tasks:
+    - name: "Task 1 of Play2: Pull Configurations from Remote Devices"
+      napalm_get_facts:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        filter: ["config"]
+      register: result
+    
+    - name: "Task 2 of Play2: Create Startup Config Subdirectory"
+      file:
+        path: "Backups/{{ hostvars.localhost.datetime}}/startup-configs"
+        state: directory
+      run_once: true
+
+    - name: "Task 3 of Play2: Create Running Config Subdirectory"
+      file:
+        path: "Backups/{{ hostvars.localhost.datetime}}/running-configs"
+        state: directory
+      run_once: true
+
+    - name: "Print result"
+      debug:
+        msg: "{{ result | to_nice_json }}"
+    
+
+
+
+
+
+
+   
+
 
 
 
