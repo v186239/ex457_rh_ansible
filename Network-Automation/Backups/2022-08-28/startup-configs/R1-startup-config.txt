@@ -78,13 +78,6 @@ router bgp 1
    network 99.99.99.99/32
    network 100.100.100.100/32
 !
-router ospf 1
-   router-id 1.1.1.1
-   network 1.1.1.1/32 area 0.0.0.0
-   network 10.1.2.0/30 area 0.0.0.0
-   max-lsa 12000
-   default-information originate
-!
 management api http-commands
    no shutdown
 !

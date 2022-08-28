@@ -1,0 +1,49 @@
+---
+- name: "Play 1 get date and time from localhost"
+  hosts: localhost
+
+  tasks:
+    - name: "Task1 of Play 1: Collect date on local host"
+      ansible.builtin.setup:
+        filter:
+          - "ansible_date_time"
+      register: output
+
+    - name: "Task2 of Play 1: Recording Variable as a fact"
+      set_fact:
+        datetime: "{{ ansible_date_time.date }}"
+
+- name: "Play 2 restore configs"
+  hosts: R1
+  connection: network_cli
+
+  tasks:
+    - name: "Task1 of Play 2: Create a Diff directory"
+      file:
+        path: "Backups/diffs/{{ hostvars.localhost.datetime }}/{{ inventory_hostname }}"
+        state: directory
+      run_once: false
+    
+    - name: "Task2 of Play2: Use NAPALM to Restore Backup Configs"
+      napalm_install_config:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        config_file: Backups/2022-08-28/startup-configs/{{ inventory_hostname }}-startup-config.txt
+        commit_changes: true
+        replace_config: true
+        get_diffs: true
+        diff_file: Backups/diffs/{{ hostvars.localhost.datetime }}/{{ inventory_hostname }}/{{ inventory_hostname }}-diffs.txt
+        optional_args:
+          global_delay_factor: 2
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result | to_nice_json }}"
+
+
+
+        
+

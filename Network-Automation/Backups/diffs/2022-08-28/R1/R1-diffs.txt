@@ -1,0 +1,9 @@
+@@ -24,7 +24,7 @@
+    name TEN
+ !
+ interface Ethernet1
+-   description Configured by Will Ansibles
++   description Configured by Will Ansible
+    no switchport
+    ip address 10.199.199.11/24
+ !

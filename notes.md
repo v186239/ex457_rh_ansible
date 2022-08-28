@@ -2483,6 +2483,112 @@ sudo timedatectl set-time "2022-08-29" to change date of local machine then run 
 ansible-playbook ansible_date_time_filter_backup.yml 
 
 
+--------------------- RESTORING CONFIGS -----------------------------
+
+Restoring our network devices from Backup configurations.
+
+Using the NAPALM install_config module to load a configuration file on the network device.
+
+https://napalm.readthedocs.io/en/latest/tutorials/ansible-napalm.html
+
+Note for Cisco devices to use NAPALM you must configure the following on Cisco
+
+conf t
+
+ip scp server enable
+
+archive
+
+path flash:archive
+
+write-memory
+
+NAPALM uses netmiko python and causes timeout error
+
+Add this to the playbook to increase the factor of time by 2 or double time
+
+       optional_args:
+          global_delay_factor: 2
+
+Also note with NAPALM requires a ETX character for Banners
+
+You can create a converter.py python script to replace the Banner special character
+
+touch converter.py
+
+import sys
+
+target = sys.argv[1]
+etx = chr(3)
+
+def get_config():
+    with open(target, "r") as f:
+        my_data = f.read()
+        final_config = my_data.replace("^C", etx)
+    return final_config
+
+def update_config(result):
+    with open(target, "w") as q:
+        q.write(result)
+
+result = get_config()
+update_config(result)
+
+python3 converter.py R1-Running-config.txt       will replace special character with etx
+
+Also note with NAPALM the Cisco IOS Configuration file must start with a version to restore
+
+
+Example Playbook to restore configs:
+
+---
+- name: "Play 1 get date and time from localhost"
+  hosts: localhost
+
+  tasks:
+    - name: "Task1 of Play 1: Collect date on local host"
+      ansible.builtin.setup:
+        filter:
+          - "ansible_date_time"
+      register: output
+
+    - name: "Task2 of Play 1: Recording Variable as a fact"
+      set_fact:
+        datetime: "{{ ansible_date_time.date }}"
+
+- name: "Play 2 restore configs"
+  hosts: R1
+  connection: network_cli
+
+  tasks:
+    - name: "Task1 of Play 2: Create a Diff directory"
+      file:
+        path: "Backups/diffs/{{ hostvars.localhost.datetime }}/{{ inventory_hostname }}"
+        state: directory
+      run_once: false
+    
+    - name: "Task2 of Play2: Use NAPALM to Restore Backup Configs"
+      napalm_install_config:
+        hostname: "{{ inventory_hostname }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        dev_os: "{{ napalm_platform }}"
+        config_file: Backups/2022-08-28/startup-configs/{{ inventory_hostname }}-startup-config.txt
+        commit_changes: true
+        replace_config: true
+        get_diffs: true
+        diff_file: Backups/diffs/{{ hostvars.localhost.datetime }}/{{ inventory_hostname }}/{{ inventory_hostname }}-diffs.txt
+        optional_args:
+          global_delay_factor: 2
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result | to_nice_json }}"
+
+
+
+        
 
 
 
