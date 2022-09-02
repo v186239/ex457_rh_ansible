@@ -1,0 +1,50 @@
+---
+- name: "Play 1 - target Cisco Devices"
+  hosts: cisco
+  connection: network_cli
+
+  tasks:
+    - name: Task1 Apply the Syslog configuration with no port
+      cisco.ios.ios_logging_global:
+          config:
+            hosts:
+              - hostname: "{{ item.ip }}"
+          state: merged
+      loop: "{{ syslog.hosts }}"
+      when: item.port is not defined
+      register: task1_output
+
+    - name: "Task1 Output"
+      debug:
+        msg: "{{ item.commands | to_nice_json  }}"
+      loop: "{{ task1_output.results }}"
+      loop_control:
+        label: none
+      when: item.commands is defined
+
+    - name: Task2 Apply the Syslog configuration with port
+      cisco.ios.ios_logging_global:
+          config:
+            hosts:
+              - hostname: "{{ item.ip }}"
+                transport:
+                  tcp:
+                    port: "{{ item.port }}"
+          state: merged
+      loop: "{{ syslog.hosts }}"
+      when: item.port is defined
+      register: task2_output
+    
+    - name: "Task2 Output"
+      debug:
+        msg: "{{ item.commands | to_nice_json  }}"
+      loop: "{{ task2_output.results }}"
+      loop_control:
+        label: none
+      when: item.commands is defined
+
+    - name: Display inventory hostname
+      ansible.builtin.debug:
+        msg:
+          - "-------------------"
+          - "{{ inventory_hostname }}"

@@ -34,5 +34,11 @@
 
     - debug: var=show_output
 
+    - name: Display inventory hostname
+      ansible.builtin.debug:
+        msg:
+          - "-------------------"
+          - "{{ inventory_hostname }}:"
+
 
 

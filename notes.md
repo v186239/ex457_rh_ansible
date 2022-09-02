@@ -2589,7 +2589,7 @@ Example Playbook to restore configs:
 
 # CONFIGURE SYSLOG AND SNMP
 
---------------------- Syslog Overview -----------------------------
+--------------------- Syslog Overview ----------------------------------------------------------
 
 Logging levels 0 - 7
 
@@ -2633,7 +2633,125 @@ Is the best option which offloads logging and sends it to an actual Server!
 
 ----------------------------------------------------------------------------------------------
 
+--------------------- Cisco Syslog Configuration using ANSIBLE----------------------------------------------------------
 
+Cisco Ansible IOS Global logging module for Ansible
+https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_logging_global_module.html#ansible-collections-cisco-ios-ios-logging-global-module
+
+Example Syslog playbook with no variables
+---
+- name: "Play 1 - target Cisco Devices"
+  hosts: cisco
+  connection: network_cli
+
+  tasks:
+    - name: Apply the provided configuration
+      cisco.ios.ios_logging_global:
+          config:
+            buffered:
+              severity: notifications
+              size: 5099
+              xml: True
+            console:
+              severity: critical
+              xml: True
+            facility: local5
+            hosts:
+              - hostname: 172.16.1.12
+              - hostname: 172.16.1.11
+                xml: True
+              - hostname: 172.16.1.10
+                filtered: True
+                stream: 10
+              - hostname: 172.16.1.13
+                transport:
+                  tcp:
+                    port: 514
+            monitor:
+              severity: warnings
+            message_counter: log
+            snmp_trap:
+              - errors
+            trap: errors
+            userinfo: True
+            logging_on: enable
+            exception: 4099
+            dmvpn:
+              rate_limit: 10
+            cns_events: warnings
+          state: merged
+      register: cisco_output
+
+    - name: "Cisco Output"
+      debug:
+        msg: "{{ cisco_output | to_nice_json  }}"
+
+Example Syslog playbook with variables
+
+First add this to the host_vars
+---
+syslog: 
+  hosts:
+    - ip: 1.1.1.1
+    - ip: 2.2.2.2
+      port: 1234
+    - ip: 3.3.3.3
+    - ip: 4.4.4.4
+      port: 5678
+
+---
+- name: "Play 1 - target Cisco Devices"
+  hosts: cisco
+  connection: network_cli
+
+  tasks:
+    - name: Task1 Apply the Syslog configuration with no port
+      cisco.ios.ios_logging_global:
+          config:
+            hosts:
+              - hostname: "{{ item.ip }}"
+          state: merged
+      loop: "{{ syslog.hosts }}"
+      when: item.port is not defined
+      register: task1_output
+
+    - name: "Task1 Output"
+      debug:
+        msg: "{{ item.commands | to_nice_json  }}"
+      loop: "{{ task1_output.results }}"
+      loop_control:
+        label: none
+      when: item.commands is defined
+
+    - name: Task2 Apply the Syslog configuration with port
+      cisco.ios.ios_logging_global:
+          config:
+            hosts:
+              - hostname: "{{ item.ip }}"
+                transport:
+                  tcp:
+                    port: "{{ item.port }}"
+          state: merged
+      loop: "{{ syslog.hosts }}"
+      when: item.port is defined
+      register: task2_output
+    
+    - name: "Task2 Output"
+      debug:
+        msg: "{{ item.commands | to_nice_json  }}"
+      loop: "{{ task2_output.results }}"
+      loop_control:
+        label: none
+      when: item.commands is defined
+
+    - name: Display inventory hostname
+      ansible.builtin.debug:
+        msg:
+          - "-------------------"
+          - "{{ inventory_hostname }}"
+        
+-----------------------------------------------------------------------------------------        
+------------------------- VYOS SYSLOG CONFIGURATION -------------------------------------
 
 
 
