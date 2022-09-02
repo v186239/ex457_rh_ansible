@@ -2587,8 +2587,55 @@ Example Playbook to restore configs:
         msg: "{{ result | to_nice_json }}"
 
 
+# CONFIGURE SYSLOG AND SNMP
 
+--------------------- Syslog Overview -----------------------------
+
+Logging levels 0 - 7
+
+*0 Emergencies - System is unusable
+
+*1 Alerts - Immediate action needed
+
+*2 Critical - Critical conditions
+
+*3 Errors - Error conditions
+
+*4 Warnings - Warning conditions
+
+*5 Notifications - Informational messages
+
+*6 Informational - Normal but significant conditions
+
+*7 Debugging - Debugging messages
+
+Logging levels are inclusive meaning:
+
+If you select logging at level 3 you get level 3 and above logging levels.   Don't worry about anything below it.
+
+If you select logging at leve 7 it will capture everything which can overwelm your devices.
+
+Console Logging 
+
+The actual device itselfs logs.
         
+Buffered Logging
+
+Allow device to save all the logs in a buffer cache
+
+Terminal Logging
+
+Logging sent over your VTY connection ssh or telnet
+
+Server Logging
+
+Is the best option which offloads logging and sends it to an actual Server!  
+
+----------------------------------------------------------------------------------------------
+
+
+
+
 
 
 
