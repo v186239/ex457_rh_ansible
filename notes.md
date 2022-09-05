@@ -2753,6 +2753,71 @@ syslog:
 -----------------------------------------------------------------------------------------        
 ------------------------- VYOS SYSLOG CONFIGURATION -------------------------------------
 
+VYOS LOGGING ANSIBLE MODULE
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_logging_global_module.html#ansible-collections-vyos-vyos-vyos-logging-global-module
+
+VYOS CONFIGURATION GUIDE - 
+
+SYSLOG FACILITIES
+https://docs.vyos.io/en/equuleus/configuration/system/syslog.html#facilities
+
+SEVERITY ALERTS
+https://docs.vyos.io/en/equuleus/configuration/system/syslog.html#severity-level
+
+VYOS SYSLOG EXAMPLE PLAYBOOK
+
+- name: "Play 2 - Target VYOS"
+  hosts: vyos
+  connection: network_cli
+   
+  tasks:
+    - name: Apply the provided configuration
+      vyos.vyos.vyos_logging_global:
+        config:
+          console:
+            facilities:
+              - facility: local7
+                severity: err
+          files:
+            - path: logFile
+              archive:
+                file_num: 2
+              facilities:
+                - facility: local6
+                  severity: emerg
+          hosts:
+            - hostname: 172.16.0.1
+              facilities:
+                - facility: local7
+                  severity: all
+                - facility: all
+                  protocol: udp
+              port: 223
+          users:
+            - username: vyos
+              facilities:
+              - facility: local7
+                severity: debug
+          # global_params:
+          #   archive:
+          #     file_num: 2
+          #     size: 111
+          #   facilities:
+          #   - facility: cron
+          #     severity: debug
+          #   marker_interval: 111
+          #   preserve_fqdn: true
+        state: merged
+      register: vyos_output
+
+    - name: "Print VYOS OUTPUT"
+      debug:
+        msg: "{{ vyos_output | to_nice_json }}"
+
+-------------------------------------------------------------------------------
+
+------------------- SNMP OVERVIEW ---------------------------------------------
+
 
 
 
