@@ -2850,10 +2850,119 @@ INFORM IS BIDIRECTIONAL
 
 NMS MUST ACK,  AGENT WILL WAIT AND LOOK AT IT'S CLOCK AND RESEND TO NMS LIKE BY THE WAY....
 
+SNMP VERSIONS
+1 not used alot
+2c introduced authentication
+3 prefered version includes all
+
 ------------------------------------------------------------------------------------------------------------
 
 -------------------------  SNMP ANSIBLE MODULES ------------------------------------------------------------
 
+CISCO IOS SNMP MODULE
+https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_snmp_server_module.html#ansible-collections-cisco-ios-ios-snmp-server-module
+
+VYOS CONFIG MODULE WOULD BE USED TO CONFIGURE SNMP AND SOURCE "src" JINJA2 TEMPLATE TO PUSH SNMP CONFIGS
+https://docs.ansible.com/ansible/latest/collections/vyos/vyos/vyos_config_module.html#ansible-collections-vyos-vyos-vyos-config-module
+
+EXAMPLE CISCO SNMP PLAYBOOK
+
+---
+- name: "Play 1 - IOS SNMP CONFIGURATION"
+  hosts: cisco
+  connection: network_cli
+
+  tasks:
+    - name: Apply the provided configuration
+      cisco.ios.ios_snmp_server:
+        config:
+          communities:
+          -   acl_v4: testACL
+              name: mergedComm
+              rw: true
+          contact: WILL RIVERA 
+          engine_id:
+          -   id: AB0C5342FF0F
+              remote:
+                  host: 172.16.0.12
+                  udp_port: 25
+          groups:
+          -   group: mergedGroup
+              version: v3
+              version_option: auth
+          file_transfer:
+                  access_group: test
+                  protocol:
+                  - ftp
+          hosts:
+          -   community_string: mergedComm
+              host: 172.16.22.9
+              informs: true
+              traps:
+              - msdp
+              - stun
+              - pki
+              version: 2c
+          -   community_string: mergedComm
+              host: 172.16.22.9
+          password_policy:
+          -   change: 3
+              digits: 23
+              lower_case: 12
+              max_len: 24
+              policy_name: MergedPolicy
+              special_char: 32
+              upper_case: 12
+          -   change: 43
+              min_len: 12
+              policy_name: MergedPolicy2
+              special_char: 22
+              upper_case: 12
+          -   change: 11
+              digits: 23
+              max_len: 12
+              min_len: 12
+              policy_name: policy3
+              special_char: 22
+              upper_case: 12
+          traps:
+              cef:
+                  enable: true
+                  inconsistency: true
+                  peer_fib_state_change: true
+                  peer_state_change: true
+                  resource_failure: true
+              msdp: true
+              ospf:
+                  cisco_specific:
+                      error: true
+                      lsa: true
+                      retransmit: true
+                      state_change:
+                          nssa_trans_change: true
+                          shamlink:
+                              interface: true
+                              neighbor: true
+                  error: true
+                  lsa: true
+                  retransmit: true
+                  state_change: true
+              syslog: true
+              tty: true
+          users:
+          -   acl_v4: '24'
+              group: dev
+              username: userPaul
+              version: v1
+        state: merged
+      
+      register: "snmp_output"
+
+    - name: "Print SNMP"
+      debug: 
+        msg: "{{ snmp_output.commands | to_nice_json }}"
+
+------------------------------------------------------------------------------------------
 
 
 
