@@ -1,0 +1,49 @@
+
+# Playbook that uses RESTCONF API to PUSH information to a Cisco CSR IOSXE device.
+# The playbook pushes data using PUT
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html
+# In front of the url path https://{{ ansible_host }}/restconf/data/native/ <--You can add keys specific to data you need like hostname
+---
+- name: "Play 1 - CONFIGURE USING RESTCONF"
+  hosts: S1
+  connection: local
+
+  tasks: 
+    - name: "Task 1 - Configure OSPF using RESTCONF and native vendor model"
+      uri:
+        url: "https://{{ ansible_host }}/restconf/data/native/router"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: PUT
+        headers:
+          Accept:
+            application/yang-data+json,
+            application/yang-data.errors+json
+          Content-Type: 'application/yang-data+json'
+        body_format: json
+        body: "{{ ospf_configure }}"
+        validate_certs: false
+        status_code:
+          - 200
+          - 204
+
+    - name: "Task 2 - Configure ACL using RESTCONF and native vendor model"
+      uri:
+        url: "https://{{ ansible_host }}/restconf/data/native/ip/access-list"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: PUT
+        # USE THE PATCH METHOD TO PUSH CONFIG AND MERGE WITH EXISTING CONFIG
+        # method: PATCH
+        headers:
+          Accept:
+            application/yang-data+json,
+            application/yang-data.errors+json
+          Content-Type: 'application/yang-data+json'
+        body_format: json
+        body: "{{ acl_configure }}"
+        validate_certs: false
+        status_code:
+          - 200
+          - 204
+        

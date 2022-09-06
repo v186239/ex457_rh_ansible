@@ -3071,7 +3071,7 @@ copy run start
 
 -----------------------------------------------------------------------------------------------------------
 
--------------------------- GETTING DATA WITH RESCONF ------------------------------------------------------
+-------------------------- GETTING DATA WITH RESTCONF ------------------------------------------------------
 
 Google search ansible url model
 
@@ -3094,6 +3094,9 @@ URL username and pasword used.
 Headers used to HTTP headers.
 
 method - GET request to retrieve,  Put to send data.
+
+CISCO NXOS RESTCONF
+https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus9000/sw/7-x/programmability/guide/b_Cisco_Nexus_9000_Series_NX-OS_Programmability_Guide_7x/b_Cisco_Nexus_9000_Series_NX-OS_Programmability_Guide_7x_chapter_010110.html
 
 EXAMPLE PLAYBOOK USING RESTCONF API
 
@@ -3127,15 +3130,441 @@ In front of the url path https://{{ ansible_host }}/restconf/data/native/ <--You
 
 -----------------------------------------------------------------------------------------------------------
 
+-------------------------- CONFIGURATION CHANGES WITH RESTCONF ------------------------------------------------------
+
+Making configuration changes using RESTCONF.
+
+The best approach to pushing a configuration is to manually apply the config on the devices, then run a Restconf get request to pull syntax data and structure a model.
+
+conf t
+
+router ospf 1
+
+router-id 1.1.1.1
+
+network 10.0.0.0 0.0.0.255 area 0
+
+network 192.168.50.0 0.0.0.255 area 0
+
+network 1.1.1.1 0.0.0.0 area 51
+
+show run | section ospf
+
+Run this Example playbook to get router ospf information.
+
+---
+- name: "Play 1 - Testing RESTCONF"
+  hosts: S1
+  connection: local
+
+  tasks: 
+    - name: "Task 1 - pull some info using RESTCONF and native vendor model"
+      uri:
+        url: "https://{{ ansible_host }}/restconf/data/native/router"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: GET
+        return_content: true
+        headers:
+          Accept: "application/yang-data+json"
+        validate_certs: false
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result.json | to_nice_json }}"
 
 
+Example output in YANG Model JSON
+
+{
+    "Cisco-IOS-XE-native:router": {
+        "Cisco-IOS-XE-ospf:router-ospf": {
+            "ospf": {
+                "process-id": [
+                    {
+                        "id": 1,
+                        "network": [
+                            {
+                                "area": 0,
+                                "ip": "10.1.1.1",
+                                "wildcard": "0.0.0.0"
+                            },
+                            {
+                                "area": 0,
+                                "ip": "10.1.2.1",
+                                "wildcard": "0.0.0.0"
+                            },
+                            {
+                                "area": 0,
+                                "ip": "10.1.3.1",
+                                "wildcard": "0.0.0.0"
+                            }
+                        ],
+                        "router-id": "6.6.6.6"
+                    },
+                    {
+                        "id": 19,
+                        "router-id": "33.44.88.22"
+                    }
+                ]
+            }
+        }
+    }
+}
+
+Grab that output and convert from JSON to YAML using this website below and store this data into the device hostvars
+https://www.json2yaml.com/
+
+S1.yml hostvar
+---
+ospf_configure:
+  Cisco-IOS-XE-native:router:
+    Cisco-IOS-XE-ospf:router-ospf:
+      ospf:
+        process-id:
+        - id: 1
+          network:
+          - area: 0
+            ip: 10.1.1.1
+            wildcard: 0.0.0.0
+          - area: 0
+            ip: 10.1.2.1
+            wildcard: 0.0.0.0
+          - area: 0
+            ip: 10.1.3.1
+            wildcard: 0.0.0.0
+          - area: 0  
+            ip: 192.168.20.0 <---------------New networks to configure
+            wildcard: 0.0.0.255
+          - area: 16
+            ip: 172.16.0.0   <---------------New networks to configure
+            wildcard: 0.0.255.255
+          router-id: 6.6.6.6
+        - id: 19
+          router-id: 33.44.88.22
+
+Example Playbook to push configuration using RESTCONF PUT METHOD
+ansible-playbook restconf2-push-data-playbook.yml
+---
+- name: "Play 1 - CONFIGURE USING RESTCONF"
+  hosts: S1
+  connection: local
+
+  tasks: 
+    - name: "Task 1 - Configure OSPF using RESTCONF and native vendor model"
+      uri:
+        url: "https://{{ ansible_host }}/restconf/data/native/router"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: PUT
+        headers:
+          Accept:
+            application/yang-data+json,
+            application/yang-data.errors+json
+          Content-Type: 'application/yang-data+json'
+        body_format: json
+        body: "{{ ospf_configure }}"
+        validate_certs: false
+        status_code:
+          - 200
+          - 204
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result | to_nice_json }}"
+
+VALIDATION ON THE DEVICE
+
+csr1000v-1#show run | section ospf
+router ospf 19
+ router-id 33.44.88.22
+router ospf 1
+ router-id 6.6.6.6
+ network 10.1.1.1 0.0.0.0 area 0
+ network 10.1.2.1 0.0.0.0 area 0
+ network 10.1.3.1 0.0.0.0 area 0
+ network 172.16.0.0 0.0.255.255 area 16  <---- new networks configured
+ network 192.168.20.0 0.0.0.255 area 0   <---- new networks configured
+
+TO DELETE THE NEW NETWORKS SIMPLY MODIFY THE HOSTVARS AND REMOVE CONFIGURATION FROM THE KEY:VALUE pair
+
+THEN RUN THE SAME PLAYBOOK TO PUT CONFIGURATION.
+
+ansible-playbook restconf2-push-data-playbook.yml
+
+VALIDATION DELETE OF NEW NETWORKS ON THE DEVICE
+
+csr1000v-1#show run | section ospf
+router ospf 19
+ router-id 33.44.88.22
+router ospf 1
+ network 10.1.1.1 0.0.0.0 area 0
+ network 10.1.2.1 0.0.0.0 area 0
+ network 10.1.3.1 0.0.0.0 area 0
+
+ ---- ANOTHER EXAMPLE OF PUT CONFIGURATION USING IP ACCESS-LIST EXAMPLE ------
+
+Log into the device and configure ACL
+
+conf t
+
+ip access-list extended IPvZero
+ 
+deny ip host 8.8.8.8 any dscp ef
+
+deny ip host 1.2.3.4
+
+deny tcp 172.16.0.0 0.0.255.255 any eq 23
+
+permit ip any any
+
+Run the playbook to GET device configuration specific to ACL
+
+ansible-playbook restconf1-get-data-playbook.yml 
+---
+- name: "Play 1 - Testing RESTCONF"
+  hosts: S1
+  connection: local
+
+  tasks: 
+    - name: "Task 1 - pull some info using RESTCONF and native vendor model"
+      uri:
+        url: "https://{{ ansible_host }}/restconf/data/native/ip/access-list"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: GET
+        return_content: true
+        headers:
+          Accept: "application/yang-data+json"
+        validate_certs: false
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result.json | to_nice_json }}"
+
+Example YAML MODEL JSON OUTPUT FOR ACL
 
 
+{
+    "Cisco-IOS-XE-native:access-list": {
+        "Cisco-IOS-XE-acl:extended": [
+            {
+                "access-list-seq-rule": [
+                    {
+                        "ace-rule": {
+                            "action": "permit",
+                            "dst-any": [
+                                null
+                            ],
+                            "dst-eq": 22,
+                            "ipv4-address": "10.123.23.0",
+                            "mask": "0.0.0.255",
+                            "protocol": "tcp"
+                        },
+                        "sequence": "10"
+                    }
+                ],
+                "name": "ACL_VTY-IN"
+            },
+            {
+                "access-list-seq-rule": [
+                    {
+                        "ace-rule": {
+                            "action": "deny",
+                            "dscp": "ef",
+                            "dst-any": [
+                                null
+                            ],
+                            "host": "8.8.8.8",
+                            "protocol": "ip"
+                        },
+                        "sequence": "10"
+                    },
+                    {
+                        "ace-rule": {
+                            "action": "deny",
+                            "dst-any": [
+                                null
+                            ],
+                            "dst-eq": "telnet",
+                            "ipv4-address": "172.16.0.0",
+                            "mask": "0.0.255.255",
+                            "protocol": "tcp"
+                        },
+                        "sequence": "20"
+                    },
+                    {
+                        "ace-rule": {
+                            "action": "permit",
+                            "any": [
+                                null
+                            ],
+                            "dst-any": [
+                                null
+                            ],
+                            "protocol": "ip"
+                        },
+                        "sequence": "30"
+                    }
+                ],
+                "name": "IPvZero"
+            }
+        ]
+    }
+}
+
+Grab that output and convert from JSON to YAML using this website below and store this data into the device hostvars
+https://www.json2yaml.com/
+
+S1.yml hostvar
+---
+acl_configure:
+  Cisco-IOS-XE-native:access-list:
+    Cisco-IOS-XE-acl:extended:
+    - access-list-seq-rule:
+      - ace-rule:
+          action: permit
+          dst-any:
+          -
+          dst-eq: 22
+          ipv4-address: 10.123.23.0
+          mask: 0.0.0.255
+          protocol: tcp
+        sequence: '10'
+      name: ACL_VTY-IN
+    - access-list-seq-rule:
+      - ace-rule:
+          action: deny
+          dst-any:
+          -
+          host: 1.2.3.4
+          protocol: ip
+        sequence: '5'
+      - ace-rule:
+          action: deny
+          dscp: ef
+          dst-any:
+          -
+          host: 8.8.8.8
+          protocol: ip
+        sequence: '10'
+      - ace-rule:
+          action: deny
+          dst-any:
+          -
+          dst-eq: telnet
+          ipv4-address: 172.16.0.0
+          mask: 0.0.255.255
+          protocol: tcp
+        sequence: '20'
+      - ace-rule:
+          action: permit
+          any:
+          -
+          dst-any:
+          -
+          protocol: ip
+        sequence: '30'
+      name: IPvZero123
+
+Run the playbook to push the configuration
+ansible-playbook restconf2-push-data-playbook.yml 
+---
+- name: "Play 1 - CONFIGURE USING RESTCONF"
+  hosts: S1
+  connection: local
+
+  tasks: 
+    - name: "Task 2 - Configure ACL using RESTCONF and native vendor model"
+      uri:
+        url: "https://{{ ansible_host }}/restconf/data/native/ip/access-list"  <--path to ACL
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: PUT
+        headers:
+          Accept:
+            application/yang-data+json,
+            application/yang-data.errors+json
+          Content-Type: 'application/yang-data+json'
+        body_format: json
+        body: "{{ acl_configure }}"
+        validate_certs: false
+        status_code:
+          - 200
+          - 204
+
+LOG INTO THE DEVICE TO VALIDATE
+
+csr1000v-1#show run | section access
+ip access-list extended IPvZero123
+ 5 deny   ip host 1.2.3.4 any
+ 10 deny   ip host 8.8.8.8 any dscp ef
+ 20 deny   tcp 172.16.0.0 0.0.255.255 any eq telnet
+ 30 permit ip any any
+
+TO REMOVE ACL CONFIGURATION SIMPLY REMOVE CONFIG FROM THE HOSTVARS FILE
+
+S1.yml  VARS FILE
+acl_configure:
+  Cisco-IOS-XE-native:access-list:
+    Cisco-IOS-XE-acl:extended:
+    - access-list-seq-rule:
+      - ace-rule:
+          action: deny
+          dst-any:
+          -
+          host: 5.6.7.8
+          protocol: ip
+        sequence: '55'
+      name: IPvZero123
+
+THEN RUN PLAYBOOK AGAIN USING THE PATCH METHOD TO MERGE CONFIGS
+
+ansible-playbook restconf2-push-data-playbook.yml 
 
 
+    - name: "Task 2 - Configure ACL using RESTCONF and native vendor model"
+      uri:
+        url: "https://{{ ansible_host }}/restconf/data/native/ip/access-list"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        # USE THE PATCH METHOD TO PUSH CONFIG AND MERGE WITH EXISTING CONFIG
+        method: PATCH
+        headers:
+          Accept:
+            application/yang-data+json,
+            application/yang-data.errors+json
+          Content-Type: 'application/yang-data+json'
+        body_format: json
+        body: "{{ acl_configure }}"
+        validate_certs: false
+        status_code:
+          - 200
+          - 204
 
+LOG INTO THE DEVICE AND VALIDATE
+csr1000v-1#show run | section access-list
+ip access-list extended IPvZero123
+ 5 deny   ip host 1.2.3.4 any
+ 10 deny   ip host 8.8.8.8 any dscp ef
+ 20 deny   tcp 172.16.0.0 0.0.255.255 any eq telnet
+ 30 permit ip any any
+ 55 deny   ip host 5.6.7.8 any  <---NEW ACL STATEMENT ADDED
 
+AS WE LEARNED HERE AUTOMATION API USING RESTCONF CAN BE A POWERFULL TOOL.   
 
+YOU CAN STORE CONFIGURATION SOURCE CONTROL IN THE HOSTVARS.
+
+THAT MEANS YOU CAN HAVE VERSIONS OF CONFIGURATION AND ROLLBACK USING A SOURCE CONTROL REPOSITORY.   
+
+IN THE CCIE LAB YOU CAN USE RESTCONF TO GET AND PUSH CONFIGS IN A FLASH!
+
+GET FAMILIAR WITH YANG, NETCONF AND RESTCONF!
+
+-----------------------------------------------------------------------------------------------------------------------------
 
 
 

@@ -1,0 +1,30 @@
+---
+
+ospf_configure:
+  Cisco-IOS-XE-native:router:
+    Cisco-IOS-XE-ospf:router-ospf:
+      ospf:
+        process-id:
+        - id: 1
+          network:
+          - area: 0
+            ip: 10.1.1.1
+            wildcard: 0.0.0.0
+          - area: 0
+            ip: 10.1.2.1
+            wildcard: 0.0.0.0
+          - area: 0
+            ip: 10.1.3.1
+            wildcard: 0.0.0.0
+          - area: 0
+            ip: 192.168.20.0
+            wildcard: 0.0.0.255
+          - area: 16
+            ip: 172.16.0.0
+            wildcard: 0.0.255.255
+          router-id: 6.6.6.6
+        - id: 19
+          router-id: 33.44.88.22
+
+ansible_user: "developer"
+ansible_password: "C1sco12345"
