@@ -1,0 +1,32 @@
+
+# Playbook that uses RESTCONF API to get information from a Cisco CSR IOSXE device.
+# The playbook gets back native data.
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html
+# In front of the url path https://{{ ansible_host }}/restconf/data/native/ <--You can add keys specific to data you need like hostname
+---
+- name: "Play 1 - Testing RESTCONF"
+  hosts: S1
+  connection: local
+
+  tasks: 
+    - name: "Task 1 - pull some info using RESTCONF and native vendor model"
+      uri:
+        # url: "https://{{ ansible_host }}/restconf/data/native"
+        # url: "https://{{ ansible_host }}/restconf/data/native/hostname"
+        # url: "https://{{ ansible_host }}/restconf/data/native/username"
+        # url: "https://{{ ansible_host }}/restconf/data/native/interface"
+        url: "https://{{ ansible_host }}/restconf/data/native/router"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: GET
+        return_content: true
+        headers:
+          Accept: "application/yang-data+json"
+        validate_certs: false
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result.json | to_nice_json }}"
+      
+        

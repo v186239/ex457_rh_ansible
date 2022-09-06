@@ -3071,6 +3071,61 @@ copy run start
 
 -----------------------------------------------------------------------------------------------------------
 
+-------------------------- GETTING DATA WITH RESCONF ------------------------------------------------------
+
+Google search ansible url model
+
+ansible.builtin.uri module – Interacts with webservices
+
+https://docs.ansible.com/ansible/latest/collections/ansible/builtin/uri_module.html
+
+Interacts with HTTP and HTTPS web services and supports Digest, Basic and WSSE HTTP authentication mechanisms.
+
+body parameter sends configs
+
+body format can be set to json
+
+url parameter HTTP or HTTPS URL in the form (http|https)://host.domain[:port]/path  <--Follows YANG model structure
+
+Web requests to get data.
+
+URL username and pasword used.
+
+Headers used to HTTP headers.
+
+method - GET request to retrieve,  Put to send data.
+
+EXAMPLE PLAYBOOK USING RESTCONF API
+
+In front of the url path https://{{ ansible_host }}/restconf/data/native/ <--You can add keys specific to data you need like hostname
+
+---
+- name: "Play 1 - Testing RESTCONF"
+  hosts: S1
+  connection: local
+
+  tasks: 
+    - name: "Task 1 - pull some info using RESTCONF and native vendor model"
+      uri:
+        # url: "https://{{ ansible_host }}/restconf/data/native"  <--This will get all of the device configuration
+        # url: "https://{{ ansible_host }}/restconf/data/native/hostname"
+        # url: "https://{{ ansible_host }}/restconf/data/native/username"
+        # url: "https://{{ ansible_host }}/restconf/data/native/interface"
+        url: "https://{{ ansible_host }}/restconf/data/native/router"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        method: GET
+        return_content: true
+        headers:
+          Accept: "application/yang-data+json"
+        validate_certs: false
+      register: result
+
+    - name: "Print Result"
+      debug:
+        msg: "{{ result.json | to_nice_json }}"
+
+-----------------------------------------------------------------------------------------------------------
 
 
 
