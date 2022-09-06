@@ -3013,6 +3013,66 @@ So we'll have to update our lab by importing a CSR IOSXE device.
 
 -----------------------------------------------------------------------------------------------------------
 
+--------------------------EVE-NG CSR Device Setup---------------------------------------------------------------
+
+Add a Cisco CSR IOXE device to the lab to be able to support API automation.
+
+You can download CSR IOSXE image from your Cisco CML lab, which is a payed account with Cisco.
+
+Log into your EVE-NG machine.
+
+How to add CSR to EVE-NG website
+https://www.eve-ng.net/index.php/documentation/howtos/howto-add-cisco-csrv1000-16-x-denali-everest-fuji/
+
+Skip to step 8 to create a new CSR image target directory.
+
+mkdir  /opt/unetlab/addons/qemu/csr1000vng-universalk9.16.09.06.Fuji/
+
+Then use WinSCP to copy the CSR image qcow2 and yaml files to this directory.
+
+Then us the mv move command to rename qcow2 image to virtioa.qcow2
+
+Update permissions.
+
+cd to that directory
+/opt/unetlab/wrappers/unl_wrapper -a fixpermissions
+
+Launch the EVE-NG LAB TOPOLOGY and add a new Cisco CSR device.
+
+Start up the CISCO CSR devices and apply basic configuration.
+
+conf t
+
+hostname R1
+
+no serv config
+
+no boot net
+
+- Netconf and Restconfig config
+
+username admin priv 15 secret cisco
+
+http server
+
+ip http authentication local
+
+ip http secure-server
+
+netconf-yang
+
+interface {{ managment }}
+
+ip address {{ ip address / mask }}
+
+exit 
+
+copy run start
+
+-----------------------------------------------------------------------------------------------------------
+
+
+
 
 
 
