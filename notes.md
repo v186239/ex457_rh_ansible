@@ -2964,6 +2964,67 @@ EXAMPLE CISCO SNMP PLAYBOOK
 
 ------------------------------------------------------------------------------------------
 
+# API-BASED Automation 
+
+Legacy method of automation using CLI and Ansible Modules.   
+When ansible does a replace of configuration on a device it does like a show run to compare what's on the device vs what you want candidate config.
+Based on those differences it will apply relevent cli commands.  CLI is Brittle. A space could break the comparison. 
+Comparison can take time and automating via the CLI which is differnt per vendor.
+
+A more modern approach something called YANG model was developed.
+YANG is a data modeling language to help stucture data.
+
+Two protocols that uses YANG.
+
+Netconf protocol uses YANG. Netconf uses XML.
+
+Netconf provides a more robust way to automate vs CLI.
+
+Netconf configs can be pushed via API.
+
+Netconf can replace, merge, delete, and get configurations on devices.
+
+NAPALM can also be used.   
+
+Netconf has a higher barrier of entry.  Using XML which is difficult.
+
+Most people prefer working with JSON and REST API.
+
+Restconf is simple and allows both XML or JSON with a lower barrier of entry.
+
+Restconf can replace, merge, delete, and get configurations on devices.
+
+Netconf uses SSH port 830
+
+Restconf usses HTTPS port 443 more like a web browser.
+
+YANG has the ability to use: 
+
+Native model - Has the ability to have vendor specific models - native model offered by Vendors.
+
+Vendor neutral models - which can be used with multiple vendors - Cisco, Juniper, Arista.
+
+We will explore API automation vs CLI.
+
+API automation is the way of the future.  
+
+Note: some legacy models don't support the lastest API automation tools like Netconf or Restconf.
+So we'll have to update our lab by importing a CSR IOSXE device.
+
+-----------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
