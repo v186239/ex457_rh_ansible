@@ -5,8 +5,91 @@ https:bit.ly/3ERJcCJ
 https://github.com/IPvZero/CodeSamples
 https://github.com/IPvZero/CodeSamples/tree/main/Ansible/
 
-# Install Ansible
+# Working from a RHEL Environment
+ 
+1. Creating a Red Hat account and download the RHEL image.
 
+2. RHEL installation on Virtual Box
+
+3. Development Environment - Install Visual Studio Code, install remote SSH extension into VS Code, use Remote Explorer to setup SSH targets to your REHL system.
+
+4. Executing Shell commands
+
+5. Working with Files
+
+
+# GIT and Verison Control
+
+6. Introduction to Verision Control
+
+7. Basic Setup
+
+8. Creating a Repository
+
+9. Reading the logs
+
+10. Creating a Test Branch
+
+11. Merging Branches
+
+12. Pushing to Remote Repositories
+
+# Configure Ansible
+
+13. Introduction to Ansible
+
+14. What is Ansible?
+
+15.  Ansible Architecture
+
+
+16. ----------------------- Install Ansible ----------------------------------------------------------------
+
+Sample Installation Procedure
+This is an example of how to install Red Hat Ansible Engine on a Red Hat Enterprise Linux control node.
+
+[root@host ~]# subscription-manager repos --enable=rhel-7-server-ansible-2-rpms
+[root@host ~]# yum install ansible
+
+Any Red Hat Enterprise Linux subscription can use this to install Ansible, with limited support scope.
+
+If you have an official Red Hat Ansible Engine support subscription, use subscription-manager to attach the control node to the pool containing it. 
+
+See https://access.redhat.com/articles/3174981
+
+Learning About Installed Plug-ins
+Plug-ins are pieces of code that augment the core functionality of Ansible.
+
+The ansible-doc tool displays information about installed Ansible plug-ins.
+
+[user@host ~]$ ansible-doc [-l|-s] [options] [-t <plugin type>] [plugin]
+Use the list option (-l) in conjunction with -t TYPE to list plug-ins of a given type. When -l is used without a type, it defaults to type module. Valid types are cache, callback, connection, inventory, lookup, shell, module, strategy, and vars.
+
+[user@host ~]$ ansible-doc -t connection -l
+To find information about a plug-in that is not of type module, you must give its type.
+
+[user@host ~]$ ansible-doc -t connection network_cli
+Ansible Program Files
+These Ansible command line programs provide important functionality.
+
+ansible
+Run ad hoc Ansible commands.
+
+ansible-config
+View, edit, and manage Ansible configuration.
+
+ansible-doc
+Ansible plug-in documentation.
+
+ansible-inventory
+Display or dump the configured inventory.
+
+ansible-playbook
+Run an Ansible Playbook, executing tasks on targeted hosts.
+
+-----------------------------------------------------------------------------------------------------
+OR 
+-----------------------------------------------------------------------------------------------------
 pip install ansible
 
 or 
@@ -3672,6 +3755,63 @@ You should see the Ansible Tower Dashboard.
 From this point we can conduct automation and build job templates, setup inventory, credentials.
 
 -----------------------------------------------------------------------------------------------------------------------------
+
+----------------------------  GENERATING CREDENTIAL IN ANSIBLE TOWER -----------------------------------------------------------------
+
+First thing to do in your lab is to setup Credentials on your devices.
+
+Log into Cisco IOS devices and add a username for Tower
+
+conf t
+
+username admin priv 15 secret cisco
+
+exit 
+
+copy run start
+
+CREATE CREDENTIALS FOR DEVICES:
+
+Click on the Credentials link in Tower
+
+Click the plus to add
+
+Enter name, description, select default Organization, search for Credential Type called Machine
+
+In the Type Details enter USERNAME AND PASSWORD 
+
+PRIVILEGE ESCATION METHOD OPTIONAL IF PRIV 15 NOT CONFIGURED ON CISCO SELECT enable then enter PRIV USERNAME AND PASSWORD.
+
+SAVE
+
+You should see Cisco creds 
+
+CREATE CREDENTIALS FOR GIT HUB REPOSITORIES:
+
+Click on the Credentials link in Tower
+
+Click the plus to add
+
+Enter name, description, select default Organization, search for Credential Type called Github Personal Access Token or Source Control
+
+If you select Github Personal Access Token 
+
+Create a TOKEN on your GITHUB, click profile go down to settings, select Developer Settings, click Personal Access Token, click Generate New Token
+
+Name:  Personal access token for Anisble Tower
+
+Select Expiration date
+
+Select scope for repo, write admin delete access, click Generate.
+
+Copy the Token to Ansible Tower Credential TOKEN box.
+
+SAVE.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+
 
 
 
