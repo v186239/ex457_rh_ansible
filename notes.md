@@ -3594,11 +3594,84 @@ ANSIBLE TOWER web based solution with lots of clicking.
 
 ----------------------------  ANSIBLE TOWER INSTALLATION -----------------------------------------------------------------
 
+Walk through the trial installation of Ansible Tower on REHL.  Note Ansible Tower can't be installed into Ubuntu.
+
+Open a web browser to this web site:
+
+https://releases.ansible.com/ansible-tower/setup-bundle
 
 
+Select the release you want to install, right click and copy the link of the URL.
+
+Then on your terminal use the wget command to download the Ansible Tower image.
+
+wget https://releases.ansible.com/ansible-tower/setup-bundle/ansible-tower-setup-bundle-3.8.5-1.tar.gz
+
+root@eveng-2:~/ex457_rh_ansible# ls -lrh ansible-tower-setup-bundle-3.8.5-1.tar.gz 
+-rw-r--r-- 1 root root 685M Dec 14  2021 ansible-tower-setup-bundle-3.8.5-1.tar.gz
+
+Then use the tar -xzvf command to unpack the tar file.
+
+root@eveng-2:~/ex457_rh_ansible# tar -xzvf ansible-tower-setup-bundle-3.8.5-1.tar.gz 
+
+root@eveng-2:~/ex457_rh_ansible# ls -lrh | grep ansible-tower-setup-bundle
+-rw-r--r--  1 root root 685M Dec 14  2021 ansible-tower-setup-bundle-3.8.5-1.tar.gz
+drwxr-xr-x  7 root root 4.0K Dec 14  2021 ansible-tower-setup-bundle-3.8.5-1
+
+Change to the directory
+
+root@eveng-2:~/ex457_rh_ansible# cd ansible-tower-setup-bundle-3.8.5-1
+
+root@eveng-2:~/ex457_rh_ansible/ansible-tower-setup-bundle-3.8.5-1# ls
+README.md  backup.yml  bundle  collections  group_vars  install.yml  inventory  licenses  rekey.yml  restore.yml  roles  setup.sh
+
+Open the inventory file and change the passwords in a LAB environment.
+
+admin_password='password'
+pg_password='password'
+automationhub_admin_password='password'
+automationhub_pg_password='password'
+
+Save the inventory file.
+
+Run the setup.sh script.
+
+root@eveng-2:~/ex457_rh_ansible/ansible-tower-setup-bundle-3.8.5-1# sudo ./setup.sh 
+
+-  NOTE THE INSTALLATION MAY TAKE 30 MINUTES! - WAIT IT OUT -
+
+Once the installation is done run the ifconfig command to get the ip address and open a web browser to that IP address
+
+https:{{ ip address}}
+
+Click advanced and accept the SSL CERT.
+
+root@eveng-2:~/ex457_rh_ansible/ansible-tower-setup-bundle-3.8.5-1# ifconfig | grep inet
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet 172.29.129.254  netmask 255.255.255.0  broadcast 172.29.129.255
+        inet 10.142.0.4  netmask 255.255.255.255  broadcast 10.142.0.4
+        inet 10.199.199.1  netmask 255.255.255.0  broadcast 10.199.199.255
+        inet 172.29.130.254  netmask 255.255.255.0  destination 172.29.130.254
 
 
+Click advanced and accept the SSL CERT.
 
+Log into tower
+username admin
+password password
+
+To get the trial subscription with Red Hat log in using your Red Hat subscription username and password.
+
+Then log into web brower again using the url
+
+https:{{ ip address}}
+
+You should see the Ansible Tower Dashboard.
+
+From this point we can conduct automation and build job templates, setup inventory, credentials.
+
+-----------------------------------------------------------------------------------------------------------------------------
 
 
 
