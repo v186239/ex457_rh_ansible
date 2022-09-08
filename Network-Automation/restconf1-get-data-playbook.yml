@@ -11,12 +11,12 @@
   tasks: 
     - name: "Task 1 - pull some info using RESTCONF and native vendor model"
       uri:
-        # url: "https://{{ ansible_host }}/restconf/data/native"
+        url: "https://{{ ansible_host }}/restconf/data/native"
         # url: "https://{{ ansible_host }}/restconf/data/native/hostname"
         # url: "https://{{ ansible_host }}/restconf/data/native/username"
         # url: "https://{{ ansible_host }}/restconf/data/native/interface"
         # url: "https://{{ ansible_host }}/restconf/data/native/router"
-        url: "https://{{ ansible_host }}/restconf/data/native/ip/access-list"
+        # url: "https://{{ ansible_host }}/restconf/data/native/ip/access-list"
         user: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
         method: GET

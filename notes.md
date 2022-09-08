@@ -3566,6 +3566,38 @@ GET FAMILIAR WITH YANG, NETCONF AND RESTCONF!
 
 -----------------------------------------------------------------------------------------------------------------------------
 
+# Configure Ansible Tower
+
+----------------------------  INTRODUCTION TO ANSIBLE TOWER -----------------------------------------------------------------
+
+Up to now we have been using ansible as a text-based solution for automation via CLI.
+
+Ansible Tower was originally developed as AWX.
+
+Ansible Tower is a GUI Web Based automation system that can lower the barrier of entry into automation for junior engineers.
+
+Ansible Tower can also be used by operations teams to execute workflows developed by network engineers.
+
+Ansible Tower has recently been replaced by Ansible Controller as part of the new Ansible Automation Platform (AAP)
+
+Ansible Tower is a Red Hat paid based solution.
+
+We will install a free evalutation Trail version of Ansible Tower.
+
+Job Templates in Tower translate to playbook.
+
+Credentials, Inventory, Workflows, surveys are part of Ansible Tower.
+
+ANSIBLE TOWER web based solution with lots of clicking.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+----------------------------  ANSIBLE TOWER INSTALLATION -----------------------------------------------------------------
+
+
+
+
+
 
 
 
