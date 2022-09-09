@@ -3865,6 +3865,80 @@ SAVE
 
 -----------------------------------------------------------------------------------------------------------------------------
 
+----------------------------  PROJECTS AND TEMPLATES IN ANSIBLE TOWER -----------------------------------------------------------------
+
+Projects are were we are going to be Sourcing our playbooks from a Git Repository.
+
+Templates are set to use the playbooks.
+
+Create a playbook to use in Ansible Tower
+
+---
+
+- name: "Tower Example Play"
+  hosts: cisco_devices
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "NTP CONFIG"
+      cisco.ios.ios_config:
+        lines:
+          - ntp server 99.99.99.99
+      register: my_output
+
+    - debug:
+        msg: "{{ my_output }}
+...
+
+Push it to your Git repository.
+
+On your Ansible Tower system
+
+mkdir collections
+cd collections
+
+touch requirements.yml  - Tells Ansible Tower which collections to install
+
+---
+
+collections:
+  - ansible.netcommon
+  - cisco.ios
+
+save the file
+
+git add * 
+
+git commit -m 'Tower update'
+
+git status
+
+git push -u origin main
+
+Create a Project in Ansible Tower with the Plus button
+
+Name, Description, Organization, SCM TYPE GIT, copy and past GIT URL, add SCM (SOURCE CONTROL) Credentials for GITHUB
+
+Check box for UPDATE REVISION ON LAUNCH
+
+SAVE
+
+Create a Template with the Plus button
+
+Name, Description, Job Type Run, Select Inventory, Select Project, Choose Playbook, Select Credentials
+
+SAVE
+
+You can now Run the Job Template which selects the particular Playbook from the Inventory.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
 
 
 
