@@ -3810,7 +3810,33 @@ SAVE.
 
 -----------------------------------------------------------------------------------------------------------------------------
 
+----------------------------  ORGANIZATIONS, GROUPS, and USERS IN ANSIBLE TOWER -----------------------------------------------------------------
 
+
+Organizations are a logical connection of Teams, Projects, and Inventories.
+
+Log into Ansible Tower, click on Organizations.
+
+Teams can be part of Organizations, users are in teams.
+
+Ansible Tower Documentation
+https://docs.ansible.com/ansible-tower/latest/html/userguide/organizations.html
+
+Create a new Organization by clicking the plus button.
+
+Enter Name, Description, Instance Group, Ansible Environment, Max Hosts (0 zero signifies no limit)
+
+SAVE
+
+Create a User with Plus button and add to new Organization.
+
+Users are Normal, System Auditor, System Admin or super user.
+
+Creat a Team with Plus button and add users.   
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+----------------------------  INVENTORIES IN ANSIBLE TOWER -----------------------------------------------------------------
 
 
 
