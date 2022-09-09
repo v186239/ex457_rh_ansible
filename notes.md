@@ -3839,8 +3839,31 @@ Creat a Team with Plus button and add users.
 ----------------------------  INVENTORIES IN ANSIBLE TOWER -----------------------------------------------------------------
 
 
+Dynamic Inventories in Ansible Tower are pulled from another source.
 
+Inventories call a remote database and pull in inventory.
 
+Ansible Tower can query a database like AWS and pull in inventory.
+
+Ansible Tower can also pull in an inventory from a Git repository.
+
+Create an Inventory with Plus button.
+
+Enter Name, Description and Organization. 
+
+For Dynamic Inventory click Sources and select SOURCE like Amazon or Git
+
+For Static Inventory click Groups and create a new group for Cisco, Arista and vYOS devices.
+
+For Cisco devices use Variable  ansible_network_os: cisco.ios.ios ansible_connection: ansible.netcommon.network_cli
+
+Create a host with the Plus button and add to this new Group.
+
+Enter Name, Description, Variables ansible_host: 192.168.0.101 
+
+SAVE
+
+-----------------------------------------------------------------------------------------------------------------------------
 
 
 
