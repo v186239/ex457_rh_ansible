@@ -3935,8 +3935,29 @@ You can now Run the Job Template which selects the particular Playbook from the 
 -----------------------------------------------------------------------------------------------------------------------------
 
 
+----------------------------  JOBS AND SURVEYS IN ANSIBLE TOWER -----------------------------------------------------------------
 
+Run the Template by clicking the Rocket button.
 
+Playbook status successfull.
+
+Log into Cisco devices and run show run | section ntp to confirm configuration.
+
+Click Jobs and select the green button job template to see details of the playbook run.
+
+Create a Survey to prompt for user input with variables.
+
+Click the Add Survey button.
+
+Enter PROMPT, ANSIBLE VARIABLE NAME, SELECT ANSWER TYPE Text, add default answer 
+
+SAVE
+
+Click the rocket button to launch to run the Playbook
+
+Ansible Tower Web Gui can make it easier for Network Automation to users.
+
+-----------------------------------------------------------------------------------------------------------------------------
 
 
 
