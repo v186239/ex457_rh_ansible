@@ -8,5 +8,12 @@
     - name: "Push some banner configuration to Vyos"
       vyos.vyos.vyos_banner:
         banner: pre-login
-        text: "Willies BANNER for VyOS"
+        text: "CBT NUGGETS BANNER for vyos"
         state: present
+      register: vyos_output
+      when: "ansible_network_os == 'vyos.vyos.vyos'"
+    
+    - name: "Print vyos VLAN Config"
+      debug:
+        msg: "{{ vyos_output.commands | to_nice_json }}"
+      when: "ansible_network_os == 'vyos.vyos.vyos'"

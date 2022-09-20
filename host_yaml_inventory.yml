@@ -8,11 +8,11 @@
           ansible_network_os: arista.eos.eos
         hosts:
           R1:
-            vars:
-              ansible_host: 10.199.199.11
+            # vars:
+              # ansible_host: 10.199.199.11
           R2:
-            vars:
-              ansible_host: 10.199.199.12                       
+            # vars:
+              # ansible_host: 10.199.199.12                       
       cisco:
         vars:
           ansible_user: "developer"
@@ -28,11 +28,11 @@
           ansible_network_os: vyos.vyos.vyos
         hosts:
           R3:
-            vars:
-              ansible_host: 10.199.199.13
+            # vars:
+              # ansible_host: 10.199.199.13
           R4:
-            vars:
-              ansible_host: 10.199.199.14  
+            # vars:
+              # ansible_host: 10.199.199.14  
 
       usa:
         children:

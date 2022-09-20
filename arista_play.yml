@@ -4,6 +4,7 @@
 ---
 - name: Arista EOS Playbook to run show commands
   hosts: arista
+  connection: network_cli
   gather_facts: false
   vars_prompt:
     - name: command
@@ -32,5 +33,5 @@
         msg:
           - "-------------------"
           - "{{ inventory_hostname }}:"
-          - "{{ output_struct }}"
+          - "{{ output_struct | to_nice_json }}"
           - "-------------------"
