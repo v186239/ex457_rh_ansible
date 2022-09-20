@@ -1,12 +1,5 @@
 ---
-  all:
-    hosts:
-      R1:
-        vars:
-          ansible_host: 10.199.199.11
-      R2:
-        vars:
-          ansible_host: 10.199.199.12                    
+  all:          
     children:
       arista:
         vars:
