@@ -1,0 +1,42 @@
+---
+  all:
+    R1 ansible_host: "10.199.199.11"
+    R2 ansible_host: "10.199.199.12"
+    R3 ansible_host: "10.199.199.13"
+    R4 ansible_host: "10.199.199.14"
+    children:
+      arista:
+        vars:
+          ansible_user: "admin"
+          ansible_password: "qwerty"
+          ansible_network_os: arista.eos.eos
+        hosts:
+          R1:
+            vars:
+              ansible_host: 10.199.199.11
+          R2:
+            vars:
+              ansible_host: 10.199.199.12                       
+      cisco:
+        vars:
+          ansible_user: "developer"
+          ansible_password: "C1sco12345"
+          ansible_network_os: ios
+        hosts:
+           S1:
+                 
+      vyos:      
+        R3 ansible_host: "10.199.199.13"
+        R4 ansible_host: "10.199.199.14"
+        vars:
+          ansible_user: "vyos"
+          ansible_password: "vyos"
+          ansible_network_os: vyos.vyos.vyos
+
+      usa:
+        R1 ansible_host: "10.199.199.11"
+        R2 ansible_host: "10.199.199.12"
+
+      uk:
+        hosts:
+          S1:

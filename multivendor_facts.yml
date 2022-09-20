@@ -20,11 +20,23 @@
     - name: "Print Arista Output"
       debug:
         # msg: "{{ eos_facts.ansible_facts.ansible_net_config.split('\n') }}"
-        msg: "{{ eos_facts.ansible_facts.ansible_net_config }}"
+        msg: 
+          # - "{{ eos_facts.ansible_facts.ansible_net_config }}"
+          - "Host name: {{ ansible_net_hostname | to_nice_json }}"
+          - "Model: {{ ansible_net_model | to_nice_json }}"
+          - "Version: {{ ansible_net_version | to_nice_json }}"
+          - "SerialNum: {{ ansible_net_serialnum | to_nice_json }}"
+          - "{{ eos_facts | to_nice_json }}"
       when: "ansible_network_os == 'arista.eos.eos'"
   
     - name: "Print VyOS Output"
       debug:
         # msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0].split('\n')  }}"
-        msg: "{{ vyos_facts.ansible_facts.ansible_net_config[0] }}"
+        msg: 
+          # - "{{ vyos_facts.ansible_facts.ansible_net_config[0] }}"
+          - "{{ vyos_facts | to_nice_json }}"
+          # - "Host name: {{ ansible_net_hostname }}"
+          # - "Model: {{ ansible_net_model }}"
+          # - "Version: {{ ansible_net_version }}"
+          # - "SerialNum: {{ ansible_net_serialnum }}"
       when: "ansible_network_os == 'vyos.vyos.vyos'"
