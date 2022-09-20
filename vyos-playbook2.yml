@@ -2,7 +2,7 @@
 
 - name: "Vyos Playbook"
   hosts: vyos
-  connection: network_ci
+  connection: network_cli
 
   tasks:
     - name: "Remove banner configuration to Vyos"

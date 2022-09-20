@@ -2,11 +2,11 @@
 
 - name: "Vyos Playbook"
   hosts: vyos
-  connection: network_ci
+  connection: network_cli
 
   tasks:
     - name: "Push some banner configuration to Vyos"
       vyos.vyos.vyos_banner:
         banner: pre-login
-        text: "CBG NUGGETS BANNER for VyOS"
+        text: "Willies BANNER for VyOS"
         state: present
