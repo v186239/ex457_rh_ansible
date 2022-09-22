@@ -3958,6 +3958,29 @@ Click the rocket button to launch to run the Playbook
 Ansible Tower Web Gui can make it easier for Network Automation to users.
 
 -----------------------------------------------------------------------------------------------------------------------------
+                                             EX457 EXAM OBJECTIVES
+-----------------------------------------------------------------------------------------------------------------------------
+OBJECTIVE: 
+        Deploy Ansible:  Ansible.cfg file and inventory using YAML file
+        Configure ACLs on iOS: Using Ansible modules and RESTCONF APIs
+        Use Conditionals:
+        Use an Ansible Role: 
+        Gather Facts: 
+        Backup config:
+        Configure OSPF: 
+        Configure Syslog:
+
+        Use Git: COMPLETED ###########################################
+        Create Host Inventories: COMPLETED ###########################################
+        Use Ansible Vault: COMPLETED ########################################### 
+        Create Ansible Tower Organizations: COMPLETED ###########################################
+        Create Ansible Tower Credentials: COMPLETED ###########################################
+        Create Ansible Tower Project: COMPLETED ###########################################
+        Create Ansible Tower Inventory: COMPLETED ###########################################
+        Create Ansible Tower Job Template: COMPLETED ###########################################
+        Create Ansible Tower Survey: COMPLETED ###########################################
+
+
 
 
 
