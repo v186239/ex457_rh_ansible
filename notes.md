@@ -129,8 +129,44 @@ An Ansible ad hoc command uses the /usr/bin/ansible command-line tool to automat
 https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
 
 On network devices we can use the raw module to run ad-hoc commands.
+ansilbe-doc -l | grep banner
+ansible-doc -l | grep _config
+ansible-doc -l | grep _system
+ansible-doc -l | grep _command
+ansible-doc -l | grep _facts
+ansible-doc -t inventory yaml
+ansible-doc -t inventory ini
+ansible-doc -t connection netconf
+ansible-doc -t connection network_cli
 
 ansible usa -m raw -c paramiko -a "show ip interface brief"
+
+ansible -m ios_command -a "commands='show ip interface brief'" cs01
+
+ansible -m ios_ping -a "dest=172.25.250.9" cs01
+
+ansible -m ios_command -a "commands='traceroute 172.25.250.254 probe 2 timeout 2'" cs01
+
+IOS AD HOC COMMANDS
+
+Display hostname
+
+ansible -m ios_command -a "commands='show run | include hostname'" cs01
+
+Change hostname using VYOS_SYSTEM module to ansible inventory hostnam
+
+ansible -m ios_system -a "hostname={{ inventory_hostname }}" cs01
+
+
+VYOS AD HOC COMMANDS
+
+Display hostname
+
+ansible -m vyos_command -a "commands='sh host name'" leaf02
+
+Change hostname using VYOS_SYSTEM module to ansible inventory hostname defined in the inventory file
+
+ansible -m vyos_system -a "host_name={{ inventory_hostname }}" leaf02
 
 # Playbooks
 
@@ -1967,6 +2003,33 @@ napalm_platform: "ios"
 
 Let's create a playbook to get facts from devices
 
+ansible-doc vyos_facts | grep -A17 "EXAMPLES"
+ansible-doc ios_facts | grep -A17 "EXAMPLES"
+
+Gather everything
+
+ansible -i inventory -m vyos_facts vyos -a 'gather_subset=all'
+
+Gather only hostname, image, model, serialnum, and version
+
+ansible -i inventory -m ios_facts ios -a 'gather_subset=default'
+
+ansible-doc -l | grep _command
+
+---
+- name: a play that gathers some facts and displays them
+  hosts: vyos
+  tasks:
+    - name: invoke vyos_facts
+      vyos_facts:
+        gather_subset: default
+    - debug:
+        msg:
+          - "Host name: {{ ansible_net_hostname }}"
+          - " Model: {{ ansible_net_model }}"
+          - " Version: {{ ansible_net_version }}"
+          - "SerialNum: {{ ansible_net_serialnum }}"
+
 NAPALM MODULES CAN BE FOUND ON THEIR WEBSITE
 https://napalm.readthedocs.io/en/latest/tutorials/ansible-napalm.html#modules
 
@@ -2337,6 +2400,29 @@ MSG:
 
   It's also important to have a log, date and time of the device.
 -----------------------------------------------------------------
+
+Backing up Configurations on Demand
+
+Ansible *os_config modules make it easy to back up network device configurations:
+• Setting the backup argument to yes causes the *os_config module to create a full backup
+of the current running configuration from the remote device.
+
+• The backup file is written to the backup/ directory in the playbook root directory or role root
+directory, if the playbook is part of an Ansible Role. If the directory does not exist, it is created.
+
+• Backup files are named using this format:
+<inventory_hostname> _config.yyyy-mm-dd@HH:MM:SS.
+
+• The file format of the backed up running configuration is platform dependent: an ios_config
+backup generates a text file containing an IOS running configuration, a vyos_config backup
+generates a text file containing a VyOS running configuration, and so forth.
+
+AD HOC backup commands
+
+ansible -i inventory -m ios_config -a 'backup=yes' cs01
+
+ansible -i inventory -m vyos_config -a 'backup=yes' spine01
+
 
 --------------------- USING THE SETUP MODULE -----------------------------
 
@@ -3961,13 +4047,15 @@ Ansible Tower Web Gui can make it easier for Network Automation to users.
                                              EX457 EXAM OBJECTIVES
 -----------------------------------------------------------------------------------------------------------------------------
 OBJECTIVE: 
-        Deploy Ansible:  Ansible.cfg file and inventory using YAML file
+        # Deploy Ansible:
+        # Gather Facts:
         Configure ACLs on iOS: Using Ansible modules and RESTCONF APIs
         Use Conditionals:
-        Use an Ansible Role: 
-        Gather Facts: 
+        # Use an Ansible Role: 
         Backup config:
-        Configure OSPF: 
+        Configure OSPF:
+        Configure BGP:
+        Configure VLANs: 
         Configure Syslog:
 
         Use Git: COMPLETED ###########################################
@@ -3979,9 +4067,6 @@ OBJECTIVE:
         Create Ansible Tower Inventory: COMPLETED ###########################################
         Create Ansible Tower Job Template: COMPLETED ###########################################
         Create Ansible Tower Survey: COMPLETED ###########################################
-
-
-
 
 
 
