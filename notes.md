@@ -129,14 +129,23 @@ An Ansible ad hoc command uses the /usr/bin/ansible command-line tool to automat
 https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html
 
 On network devices we can use the raw module to run ad-hoc commands.
+
 ansilbe-doc -l | grep banner
+
 ansible-doc -l | grep _config
+
 ansible-doc -l | grep _system
+
 ansible-doc -l | grep _command
+
 ansible-doc -l | grep _facts
+
 ansible-doc -t inventory yaml
+
 ansible-doc -t inventory ini
+
 ansible-doc -t connection netconf
+
 ansible-doc -t connection network_cli
 
 ansible usa -m raw -c paramiko -a "show ip interface brief"
@@ -4049,13 +4058,21 @@ Ansible Tower Web Gui can make it easier for Network Automation to users.
 OBJECTIVE: 
         # Deploy Ansible:
         # Gather Facts:
+
         Configure ACLs on iOS: Using Ansible modules and RESTCONF APIs
+
         Use Conditionals:
+
         # Use an Ansible Role: 
+
         Backup config:
+
         Configure OSPF:
+
         Configure BGP:
+
         Configure VLANs: 
+        
         Configure Syslog:
 
         Use Git: COMPLETED ###########################################
