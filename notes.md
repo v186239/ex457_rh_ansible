@@ -1242,6 +1242,43 @@ To move data in VS Code hold down Ctrl and push the right or left square bracket
         msg: "{{ vyos_facts.commands }}"
       when: "ansible_network_os == 'vyos.vyos.vyos'"
 
+# Bouncing Interfaces using Pause for a second task
+
+vi bounce-if.yml
+# ansible-playbook -e "target=leaf01 intf=eth6" bounce-if.yml
+---
+- name: bounce an interface (shut/no shut)
+# Required arguments: target, intf
+hosts: "{{ target }}"
+tasks:
+- name: shut interface {{ intf }} on a VyOS box
+    vyos_interface:
+      name: "{{ intf }}"
+      enabled: False
+  when: target in groups['vyos']
+
+- name: shut interface {{ intf }} on an IOS box
+  ios_interface:
+    name: "{{ intf }}"
+    enabled: False
+  when: target in groups['ios']
+
+- name: pause briefly before enabling interfaces
+  pause:
+    seconds: 1
+
+- name: enable interface {{ intf }} on a VyOS box
+  vyos_interface:
+    name: "{{ intf }}"
+    enabled: True
+  when: target in groups['vyos']
+
+- name: enable interface {{ intf }} on an IOS box
+  ios_interface:
+    name: "{{ intf }}"
+    enabled: True
+  when: target in groups['ios']
+
 # Configuring OSPF
 
 Before you start automating OSPF, always make sure you know what it is that you are trying to automation. 
@@ -4056,14 +4093,14 @@ Ansible Tower Web Gui can make it easier for Network Automation to users.
                                              EX457 EXAM OBJECTIVES
 -----------------------------------------------------------------------------------------------------------------------------
 OBJECTIVE: 
-        # Deploy Ansible:
-        # Gather Facts:
+        Deploy Ansible  COMPLETED ###########################################
+        Gather Facts  COMPLETED ###########################################
 
         Configure ACLs on iOS: Using Ansible modules and RESTCONF APIs
 
         Use Conditionals:
 
-        # Use an Ansible Role: 
+        Use an Ansible Role COMPLETED ###########################################
 
         Backup config:
 
@@ -4075,7 +4112,7 @@ OBJECTIVE:
         
         Configure Syslog:
 
-        Use Git: COMPLETED ###########################################
+        Use Git  COMPLETED ###########################################
         Create Host Inventories: COMPLETED ###########################################
         Use Ansible Vault: COMPLETED ########################################### 
         Create Ansible Tower Organizations: COMPLETED ###########################################
