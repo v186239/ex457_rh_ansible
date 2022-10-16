@@ -4367,6 +4367,7 @@ access-list 101 permit tcp any any eq 22 log
   ip access-group 101 in
 
 vim vyos-config.j2
+
 set system host-name {{ inventory_hostname }}
 set system domain-name {{ domain_name }}
 {% for nameserver in nameservers %}
@@ -4380,7 +4381,7 @@ set system name-server {{ nameserver }}
   vars:
     vyos_template: j2/vyos-config.j2
     ios_template: j2/ios-config.j2
-    
+
   tasks:
     - name: configure {{ inventory_hostname }}
       vyos_config:
@@ -4717,13 +4718,13 @@ OBJECTIVE:
 
         Use an Ansible Role COMPLETED ###########################################
 
-        Backup config:
+        Backup config: COMPLETED ###########################################
 
         Configure OSPF COMPLETED ###########################################
 
         Configure BGP COMPLETED ###########################################
 
-        Configure VLANs: 
+        Configure VLANs: COMPLETED ###########################################
         
         Configure Syslog COMPLETED ###########################################
 
