@@ -1744,6 +1744,18 @@ exit
 copy run start
 {% endif %}
 
+--------------------- VLAN Configuration using COMMAND MODULES ------------------------------------------
+
+The following task applies commands within the context of a given interface using variables found in the hostvars 
+
+- name: configure an interface
+  ios_config:
+    lines:
+      - switchport access vlan {{ interface.vlan }}
+      - description: {{ interface.description }}
+      - no shutdown
+  parents: interface {{ interface.name }}
+
 --------------------- VLAN Configuration using ANSIBLE MODULES  -----------------------------------------
 
 
@@ -2850,6 +2862,13 @@ Is the best option which offloads logging and sends it to an actual Server!
 
 --------------------- Cisco Syslog Configuration using ANSIBLE----------------------------------------------------------
 
+SYSLOG TCPDUMP command
+sudo tcpdump -Xni eth0 port 514
+
+Open an ssh to Cisco device and run this command
+
+send log this is a test
+
 Cisco Ansible IOS Global logging module for Ansible
 https://docs.ansible.com/ansible/latest/collections/cisco/ios/ios_logging_global_module.html#ansible-collections-cisco-ios-ios-logging-global-module
 
@@ -3779,6 +3798,602 @@ IN THE CCIE LAB YOU CAN USE RESTCONF TO GET AND PUSH CONFIGS IN A FLASH!
 
 GET FAMILIAR WITH YANG, NETCONF AND RESTCONF!
 
+-------------------------------------------------------------------------------------------
+
+# Generating ping Packets Playbook
+
+vim vyos-sourced-icmp-ping.yml
+
+---
+- name: test reachability using ICMP
+  hosts: vyos
+  gather_facts: no
+  vars:
+    count: 3
+    # (to) and (from) vars (destination and source interface IPs) are --extra-vars
+    cmds: [ "ping {{ to }} interface {{ from }} count {{ count }}" ]
+  tasks:
+    - name: on {{ inventory_hostname }} to {{ to }} from {{ fr }}
+      vyos_command:
+        commands: "{{ cmds }}"
+      register: ping_result
+      when: ansible_network_os == 'vyos'
+
+    - name: display the result
+      debug:
+        msg: "{{ ping_result }}"
+
+ansible-playbook -l spine01 -e"from=10.10.5.1 to=10.10.5.2" vyos-sourced-icmp-ping.yml
+
+
+Consolidated Multivendor Lay3 Interface playbook 
+
+---
+- name: consolidate the layer 3 network
+  hosts: network
+  vars_files:
+    - vars/consolidation-data.yml
+
+  tasks:
+    - name: configure interface descriptions
+      vyos_interface:
+        name: "{{ item.key }}"
+        description: "{{ item.value.description }}"
+      with_dict: "{{ interface_data[inventory_hostname] }}"
+      when: ansible_network_os == 'vyos'
+
+    - name: configure layer 3
+      vyos_l3_interface:
+        aggregate: "{{ layer3_data[inventory_hostname] }}"
+      when: ansible_network_os == 'vyos'
+
+    - name: configure interface descriptions
+      ios_interface:
+        name: "{{ item.key }}"
+        description: "{{ item.value.description }}"
+      with_dict: "{{ interface_data[inventory_hostname] }}"
+      when: ansible_network_os == 'ios'
+
+    - name: configure layer 3
+      ios_l3_interface:
+        aggregate: "{{ layer3_data[inventory_hostname] }}"
+      when: ansible_network_os == 'ios'
+
+ansible -m vyos_command -a "commands='sh int'" vyos
+
+ansible -m ios_command -a "commands='sh ip int br'" cs01
+
+-----------------------------------
+
+# Configure OSPF 
+
+The following are minimal OSPF configurations for a VyOS and an IOS device:
+
+VyOS:
+set interfaces loopback lo address 10.0.0.1/32
+set protocols ospf parameters router-id 10.0.0.1
+set protocols ospf area 0 network 10.10.1.0/24
+set protocols ospf log-adjacency-changes
+
+IOS:
+no router ospf 1
+router ospf 1
+router-id 172.16.0.1
+network 172.16.2.0 0.0.0.3 area 0
+network 172.16.5.0 0.0.0.3 area 0
+network 172.16.10.0 0.0.0.3 area 0
+
+VYOS J2
+Create a Jinja2 template that constructs statements to configure OSPF on VyOS
+devices. Create a file named j2/vyos-ospf.j2 with the following content:
+
+{% for intf in layer3_data[inventory_hostname] %}
+{% if intf.name == 'lo' %}
+set protocols ospf parameters router-id {{ intf.ipv4 | ipaddr('address') }}
+set protocols ospf log-adjacency-changes
+set protocols ospf redistribute connected metric-type 2
+{% if inventory_hostname == 'spine01' or inventory_hostname == 'spine02' %}
+set protocols ospf default-information originate always
+set protocols ospf default-information originate metric 10
+set protocols ospf default-information originate metric-type 2
+{% endif %}
+{% else %}
+set protocols ospf area 0 network {{ intf.ipv4 | ipaddr('network/prefix') }}
+{% endif %}
+{% endfor %}
+
+IOS J2
+
+Create a Jinja2 template that constructs statements to configure OSPF on IOS
+devices. Create a file named j2/ios-ospf.j2 with the following content: Note the
+line starting with network may have wrapped; it should end with area 0.
+
+router ospf 1
+{% for intf in layer3_data[inventory_hostname] %}
+{% if intf.name.startswith('Loopback') %}
+router-id {{ intf.ipv4 | ipaddr('address') }}
+{% else %}
+network {{ intf.ipv4 | ipaddr('network') }} {{ intf.ipv4 | ipaddr('hostmask') }} area 0
+{% endif %}
+{% endfor %}
+
+MutliVendor IOS and VYOS OSPF PLAYBOOK
+
+Compose a playbook that configures OSPF based on data and templates. Create a
+file named ospf-consolidation.yml with the following content:
+
+---
+- name: play that configures OSPF according to data and templates
+  hosts: network
+  vars:
+    vyos_ospf_template: j2/vyos-ospf.j2
+    ios_ospf_template: j2/ios-ospf.j2
+  vars_files:
+    - vars/consolidation-data.yml
+
+  tasks:
+    - name: configure ospf on vyos
+      vyos_config:
+        src: "{{ vyos_ospf_template }}"
+        save: True
+      when: ansible_network_os == 'vyos'
+
+    - name: configure ospf on ios
+      ios_config:
+        src: "{{ ios_ospf_template }}"
+        save_when: changed
+      when: ansible_network_os == 'ios'
+
+
+ansible -m vyos_command -a "commands='sh ip ro'" spine01
+
+ansible -m ios_command -a "commands='sh ip ro'" cs01
+
+--------------------------------------------------------------------------------------------
+
+Verifying End-to-End Reachability
+
+Add variables that identity ingress and egress points as source and destination for ping test.
+Create a variables file named vars/ping-srcdst.yml that contains this data:
+
+pingcount: 2
+ping_data:
+leaf01:
+- { src: "10.10.10.1", dst: "192.168.10.1" }
+- { src: "10.10.10.1", dst: "172.16.10.1" }
+leaf02:
+- { src: "192.168.10.1", dst: "10.10.10.1" }
+- { src: "192.168.10.1", dst: "172.16.10.1" }
+cs01:
+- { src: "172.16.10.1", dst: "10.10.10.1" }
+- { src: "172.16.10.1", dst: "192.168.10.1" }
+
+Compose a multivendor playbook that loops over the ping data tuples for each host
+and pings from source to destination. Include a task that loops over the result set
+and asserts that output from the ping test matches patterns that reliably indicate a
+successful test.
+
+Create a file named e2e.yml with content similar to the following:
+
+---
+- name: verify connectivity end-to-end
+  hosts: access-layer
+  vars_files:
+    - vars/ping-srcdst.yml
+
+  tasks:
+    - name: run ping commands on VyOS access layer device
+      vyos_command:
+        commands:
+          - ping {{ item.dst }} interface {{ item.src }} count {{ pingcount }}
+      register: ping_result
+      loop: "{{ ping_data[inventory_hostname] }}"
+      when: ansible_network_os == 'vyos'
+  
+    - name: looped assertion of ping results from VyOS access layer device
+      assert:
+        that: "', 0% packet loss' in item.stdout[0]"
+      loop: "{{ ping_result.results }}"
+      when: ansible_network_os == 'vyos'
+    
+    - name: prime IOS arp cache
+      ios_command:
+      commands:
+        - ping {{ item.dst }} source {{ item.src }} repeat 1
+      loop: "{{ ping_data[inventory_hostname] }}"
+      when: ansible_network_os == 'ios'
+
+    - name: "run ping commands on IOS access layer device {{ inventory_hostname }}"
+      ios_command:
+        commands:
+          - ping {{ item.dst }} source {{ item.src }} repeat {{ pingcount }}
+      register: ping_result
+      loop: "{{ ping_data[inventory_hostname] }}"
+      when: ansible_network_os == 'ios'
+
+      - name: looped assertion of ping results from IOS access layer device
+        assert:
+          that: "'Success rate is 100 percent' in item.stdout[0]"
+        loop: "{{ ping_result.results }}"
+        when: ansible_network_os == 'ios'
+
+ansible-playbook e2e.yml
+
+
+--------------------------------------------------------------------------------------------
+
+# Configure ACL Access Control List
+
+Example Cisco ACL PLaybook
+
+[student@workstation proj]$ mkdir -p group_vars/all
+Add variables workstation_ipv4 and tower_ipv4 to the group_vars/all/
+vars.yml file. Create this file if it does not already exist. Edit it to make sure it
+contains the following contents:
+workstation_ipv4: 172.25.250.254/24
+tower_ipv4: 172.25.250.9/24
+
+---
+- name: A play that creates a management access ACL
+  hosts: ios
+  gather_facts: no
+  tasks:
+    - name: create a standard ACL
+      ios_config:
+        lines:
+        # each of the following two items consist of a single line
+        # with no line breaks
+        - 10 permit {{ workstation_ipv4 | ipaddr('address') }}
+        {{ workstation_ipv4 | ipaddr('wildcard') }} log
+        - 20 permit {{ tower_ipv4 | ipaddr('address') }} {{ tower_ipv4 |
+  ipaddr('wildcard') }} log
+          parents: ["access-list standard 1"]
+          before: ["no access-list standard 1"]
+          match: exact
+
+Validate ACL Configuration
+
+ansible -m ios_command -a "commands='sh access-list 1'" cs01
+
+
+--------------------------------------------------------------------------------------------
+
+# Configure BGP
+
+The following is a minimal configuration for EBGP on a VyOS device:
+
+set interfaces loopback lo address 10.0.0.1/32
+set protocols bgp 100 parameters router-id '10.0.0.1'
+set protocols bgp 100 network 10.10.1.0/24
+set protocols bgp 100 network 10.10.10.0/24
+set protocols bgp 100 neighbor 172.25.250.61 remote-as '200'
+
+This configuration:
+• Binds IPv4 address 10.0.0.1/32 to the loopback interfaces.
+• Configures the BGP router-id as the loopback address.
+• Defines the networks known to this router.
+• Defines the BGP neighbor.
+
+A Jinja2 template takes BGP data and uses it to produce VyOS EBGP configuration statements.
+
+$ cat j2/vyos-bgp.j2
+set protocols bgp {{ bgp_data[inventory_hostname]['as'] }} parameters router-id
+{{ bgp_data[inventory_hostname]
+['router-id'] | ipaddr("address") }}
+{% for nei in bgp_data[inventory_hostname]['neighbors'] -%}
+set protocols bgp {{ bgp_data[inventory_hostname]['as'] }} neighbor {{ nei['ipv4']
+| ipaddr('address') }} remote-as
+{{ nei['as'] }}
+{% endfor -%}
+{% for net in bgp_data[inventory_hostname]['networks'] -%}
+set protocols bgp {{ bgp_data[inventory_hostname]['as'] }} network {{ net }}
+{% endfor -%}
+
+EXAMPLE VYOS BGP PLAYBOOK:
+---
+- name: Play that sets up eBGP on the spine devices
+  hosts: spines
+  gather_facts: no
+  vars_files:
+    - "{{ playbook_dir }}/vars/bgp-vars.yml
+
+  tasks:
+    - name: configure devices
+      vyos_config:
+        src: j2/vyos-bgp.j2
+        save: yes
+
+Create a ebgp-breakup-data.yml vars file in the vars directory
+
+vim ebgp-breakup-data.yml
+
+bgp_data:
+  spine01:
+    as: 10000
+    router-id: 10.0.0.1/32
+    networks:
+    - 10.10.5.0/30
+    - 10.10.10.0/30
+    neighbors:
+    - { as: 17216, ipv4: 172.16.2.2/30}
+
+  spine02:
+    as: 19216
+    router-id: 192.168.0.1/32
+    networks:
+    - 10.10.5.0/30
+    - 10.10.10.0/30
+    neighbors:
+    - { as: 17216, ipv4: 172.16.5.2/30}
+
+   cs01:
+   as: 17216
+   router-id: 172.16.0.1/32
+   networks:
+   - 172.16.10.0/30
+   - 192.168.0.0/16
+   - 10.10.0.0/16
+   neighbors:
+   - { as: 10000, ipv4: 172.16.2.1/30}
+   - { as: 19216, ipv4: 172.16.5.1/30}
+
+neighbors:
+  spine01:
+  - { as: 17216, ipv4: 172.16.2.2/30}
+
+  spine02:
+  - { as: 17216, ipv4: 172.16.5.2/30}
+
+  cs01:
+  - { as: 10000, ipv4: 172.16.2.1/30}
+  - { as: 19216, ipv4: 172.16.5.1/30}
+
+networks:
+  spine01:
+  - 10.10.5.0/30
+  - 10.10.10.0/30
+  spine02:
+  - 192.168.5.0/30
+  - 192.168.10.0/30
+  cs01:
+  - 172.16.0.0/30
+
+VYOS BGP JINJA2
+
+set protocols bgp {{ bgp_data[inventory_hostname]['as'] }} parameters router-id
+{{ bgp_data[inventory_hostname]['router-id'] | ipaddr("address") }}
+{% for nei in bgp_data[inventory_hostname]['neighbors'] %}
+set protocols bgp {{ bgp_data[inventory_hostname]['as'] }} neighbor {{ nei['ipv4']
+| ipaddr('address') }} remote-as {{ nei['as'] }}
+{% endfor %}
+{% for net in bgp_data[inventory_hostname]['networks'] %}
+set protocols bgp {{ bgp_data[inventory_hostname]['as'] }} network {{ net }}
+{% endfor %}
+
+
+IOS BGP JINJA2
+
+j2/ios-bgp.j2
+router bgp {{ bgp_data[inventory_hostname]['as'] }}
+{% for net in bgp_data[inventory_hostname]['networks'] %}
+network {{ net | ipaddr('network') }} mask {{ net | ipaddr('netmask') }}
+{% endfor %}
+{% for nei in bgp_data[inventory_hostname]['neighbors'] %}
+neighbor {{ nei['ipv4'] | ipaddr('address') }} remote-as {{ nei['as'] }}
+{% endfor %}
+
+MULTIVENDOR IOS AND VYOS BGP Playbook
+
+---
+- name: configure eBGP on VyOS and IOS border routers
+  hosts: border-routers
+  vars:
+    vyos_bgp_tpl: j2/vyos-bgp.j2
+    ios_bgp_tpl: j2/ios-bgp.j2
+  vars_files:
+    - vars/ebgp-breakup-data.yml # NOTE THIS VARS FILES CONTAINS ALL THE VARS NEEDED IN BOTH JINJA2 FILES
+
+  tasks:
+    - name: static routes on cs01 to support non-local BGP routes
+      ios_config:
+        lines:
+          - ip route 10.10.0.0 255.255.0.0 GigabitEthernet2 172.16.2.1
+          - ip route 192.168.0.0 255.255.0.0 GigabitEthernet3 172.16.5.1
+      when: inventory_hostname == 'cs01'
+    
+    - name: "map bgp data to ios device using {{ ios_bgp_tpl }}"
+      ios_config:
+        src: "{{ ios_bgp_tpl }}"
+      when: ansible_network_os == 'ios'
+    
+    - name: "map bgp data to vyos device using {{ vyos_bgp_tpl }}"
+      vyos_config:
+        src: "{{ vyos_bgp_tpl }}"
+      when: ansible_network_os == 'vyos'
+
+VERIFY BGP
+
+ansible -m ios_command -a "commands='sh ip bgp sum'" cs01
+
+ansible -m vyos_command -a "commands='sh ip bgp sum'" spines
+
+-------------------------------------------------------------------------------------------
+
+# Upgrading the Network OS on Devices
+
+Upgrading IOS on Cisco Devices
+
+Be sure to thoroughly test and verify automation processes before involving production resources.
+Upgrading IOS on Cisco devices typically involves these steps, each of which can be automated
+with Ansible:
+
+• Gather information (facts).
+• Obtain an updated image and copy it to device flash.
+• Set the device to boot from the new image.
+• Ensure that the running configuration is saved and backed up.
+• Reload the device.
+• Verify connectivity and functionality when the boot sequence finishes.
+
+Upgrading VyOS on VyOS Devices
+
+VyOS has a simpler upgrade procedure.
+An upgrade method for VyOS:
+• Store the URL of the new image in a variable.
+• Get the old system image.
+• Download a fresh image.
+• Get a new system image.
+• Reload only if the new image is different from the old image.
+• Wait for restart.
+
+EXAMPLE VYOS UPGRADE PLAYBOOK
+
+# sysimg_url var can also be defined in group_vars
+
+---
+- name: a play that upgrades a VyOS device
+  hosts: spine02
+  gather_facts: no
+  vars:
+    sysimg_url: https://downloads.vyos.io/release/1.1.8/vyos-1.1.8-amd64.iso
+
+  tasks:
+
+    - name: get old system image information
+      vyos_command:
+        commands:
+          - show system image
+      register: old_system_image
+
+    - name: download fresh system image
+      vyos_command:
+        commands:
+          - add system image {{ sysimg_url }}
+    
+    - name: get new system image information
+      vyos_command:
+        commands:
+          - show system image
+      register: new_system_image
+    
+    - name: reload only if changed
+      vyos_command:
+        commands:
+          - command: reboot now
+      ignore_errors: yes
+      when: old_system_image.stdout != new_system_image.stdout
+    
+    - name: wait for restart
+      wait_for_connection:
+        delay: 20
+        timeout: 120
+      when: old_system_image.stdout != new_system_image.stdout
+    
+
+Perform the play in check-only mode to determine what effect it would have in change
+mode. Execute the ansible-playbook command using the --check or -C option. Limit
+it to spine01.
+
+ansible-playbook -C -l spine01 vyos-upgrade.yml
+
+--------------------------------------------------------------------------------------------
+
+# Configure SNMP
+
+SNMP TOOL USED TO VERIFY SNMP WITH SNMPWALK
+
+sudo yum install net-snmp-utils
+
+snmpwalk -v1 -c redhat spine01 sysName
+
+The following task configures the community string for read-only access on an IOS device:
+
+- name: set the RO community string
+  ios_config:
+    lines:
+      - snmp-server community {{ ro_community }} RO
+
+A similar configuration statement for VyOS is shown below:
+
+- name: set the RO community string
+  vyos_config:
+    lines:
+      - set service snmp community {{ ro_community }} authorization ro
+
+Add a variable to the network group variables file to support template-driven
+configuration that enables SNMP. Add another variable, named ro_community, and set
+the value of this variable to redhat. The updated group_vars/network/vars.yml
+variable file should have the following content:
+---
+  ansible_connection: network_cli
+  domain_name: lab.example.com
+  nameservers:
+  - 8.8.8.8
+  - 8.8.4.4
+  syslog_ipv4: 172.25.250.254
+  ro_community: redhat
+  snmp_clients:
+  - 172.25.250.254
+  - 172.25.250.9
+
+Add this to vyos-config.j2 template if used in a playbook with src
+
+set service snmp community {{ ro_community }} authorization ro
+{% for snmp_client in snmp_clients %}
+set service snmp community {{ ro_community }} client {{ snmp_client }}
+{% endfor %}
+
+Add this to ios-config.j2 template if used in a playbook with src
+
+snmp-server community {{ ro_community }} RO 1
+
+# Multivendor Anisble Playbook with Jinja2 Templates
+
+vim ios-config.j2
+
+hostname {{ inventory_hostname }}
+ip domain-name {{ domain_name }}
+{% for nameserver in nameservers %}
+ip name-server {{ nameserver }}
+{% endfor %}
+service timestamps log datetime
+service timestamps debug datetime
+logging {{ syslog_ipv4 }}
+logging trap {{ ios_loglevel }}
+access-list 1 permit {{ workstation_ipv4 | ipaddr('address') }} log
+access-list 1 permit {{ tower_ipv4 | ipaddr('address') }} log
+snmp-server community {{ ro_community }} RO 1
+access-list 101 permit tcp any any eq 22 log
+  interface GigabitEthernet1
+  ip access-group 101 in
+
+vim vyos-config.j2
+set system host-name {{ inventory_hostname }}
+set system domain-name {{ domain_name }}
+{% for nameserver in nameservers %}
+set system name-server {{ nameserver }}
+{% endfor %}
+
+
+---
+- name: configure devices using j2 templates
+  hosts: network
+  vars:
+    vyos_template: j2/vyos-config.j2
+    ios_template: j2/ios-config.j2
+    
+  tasks:
+    - name: configure {{ inventory_hostname }}
+      vyos_config:
+        src: "{{ vyos_template }}"
+      when: ansible_network_os == 'vyos'
+
+    - name: configure {{ inventory_hostname }}
+      ios_config:
+        src: "{{ ios_template }}"
+      when: ansible_network_os == 'ios'
+
+
+
 -----------------------------------------------------------------------------------------------------------------------------
 
 # Configure Ansible Tower
@@ -4096,21 +4711,21 @@ OBJECTIVE:
         Deploy Ansible  COMPLETED ###########################################
         Gather Facts  COMPLETED ###########################################
 
-        Configure ACLs on iOS: Using Ansible modules and RESTCONF APIs
+        Configure ACLs on iOS: Using Ansible modules and RESTCONF APIs COMPLETED ###########################################
 
-        Use Conditionals:
+        Use Conditionals COMPLETED ###########################################
 
         Use an Ansible Role COMPLETED ###########################################
 
         Backup config:
 
-        Configure OSPF:
+        Configure OSPF COMPLETED ###########################################
 
-        Configure BGP:
+        Configure BGP COMPLETED ###########################################
 
         Configure VLANs: 
         
-        Configure Syslog:
+        Configure Syslog COMPLETED ###########################################
 
         Use Git  COMPLETED ###########################################
         Create Host Inventories: COMPLETED ###########################################
