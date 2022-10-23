@@ -2481,6 +2481,21 @@ ansible -i inventory -m ios_config -a 'backup=yes' cs01
 
 ansible -i inventory -m vyos_config -a 'backup=yes' spine01
 
+Example Backup Playbook for MutiVendor
+
+---
+- name: back up network device configurations
+  hosts: network
+  tasks:
+  - name: backup config of vyos device
+    vyos_config:
+      backup: yes
+    when: ansible_network_os == 'vyos'
+
+  - name: backup config of ios device
+    ios_config:
+      backup: yes
+    when: ansible_network_os == 'ios'
 
 --------------------- USING THE SETUP MODULE -----------------------------
 
@@ -3992,7 +4007,7 @@ Create a file named e2e.yml with content similar to the following:
   
     - name: looped assertion of ping results from VyOS access layer device
       assert:
-        that: "', 0% packet loss' in item.stdout[0]"
+        that: "', packet loss' in item.stdout[0]"
       loop: "{{ ping_result.results }}"
       when: ansible_network_os == 'vyos'
     
@@ -4711,23 +4726,14 @@ Ansible Tower Web Gui can make it easier for Network Automation to users.
 OBJECTIVE: 
         Deploy Ansible  COMPLETED ###########################################
         Gather Facts  COMPLETED ###########################################
-
         Configure ACLs on iOS: Using Ansible modules and RESTCONF APIs COMPLETED ###########################################
-
         Use Conditionals COMPLETED ###########################################
-
         Use an Ansible Role COMPLETED ###########################################
-
         Backup config: COMPLETED ###########################################
-
         Configure OSPF COMPLETED ###########################################
-
         Configure BGP COMPLETED ###########################################
-
         Configure VLANs: COMPLETED ###########################################
-        
         Configure Syslog COMPLETED ###########################################
-
         Use Git  COMPLETED ###########################################
         Create Host Inventories: COMPLETED ###########################################
         Use Ansible Vault: COMPLETED ########################################### 
@@ -4739,8 +4745,24 @@ OBJECTIVE:
         Create Ansible Tower Survey: COMPLETED ###########################################
 
 
-
-
+        15 points each
+        Deploy Ansible:
+        Use Git: 
+        Create Host Inventories: 
+        Configure ACLs on iOS:
+        Use Conditionals:
+        *Use an Ansible Role:
+        Use Ansible Vault: 
+        Gather Facts:
+        *Backup config:
+        *Configure OSPF:
+        Configure Syslog:
+        Create Ansible Tower Organizations: 
+        Create Ansible Tower Credentials: 
+        Create Ansible Tower Project: 
+        Create Ansible Tower Inventory: 
+        Create Ansible Tower Job Template:
+        Create Ansible Tower Survey:
 
 
 
