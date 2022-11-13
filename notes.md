@@ -141,6 +141,7 @@ ansible-doc -l | grep _command
 ansible-doc -l | grep _facts
 
 ansible-doc -t inventory yaml
+https://www.youtube.com/watch?v=OdDp86OchSg
 
 ansible-doc -t inventory ini
 
@@ -4764,9 +4765,94 @@ OBJECTIVE:
         Create Ansible Tower Job Template:
         Create Ansible Tower Survey:
 
+# Edit VIMRC to auto space indentation in YAML files
+vi ~/.vimrc
+autocmd FileType yaml setlocal ai ts=2 sw=2 et
 
+# group vars for test
+[student@workstation ~]$ cat group_vars/network
+ansible_connection: network_cli
 
+student@workstation ~]$ cat group_vars/vyos
+ansible_network_os: vyos
+ansible_user: vyos
 
+[student@workstation ~]$ cat group_vars/ios
+ansible_network_os: ios
+ansible_user: admin
+
+# ini inventory format
+[leafs]
+leaf01
+leaf02
+[spines]
+spine01
+spine02
+[border-routers]
+spine01
+spine02
+cs01
+[access-layer]
+leaf01
+leaf02
+cs01
+[cloud-services]
+cs01
+[ios]
+cs01
+[vyos:children]
+spines
+leafs
+[network:children]
+vyos
+ios
+
+# YAML inventory format
+---
+all:
+    vars:
+        ansible_connection: network_cli
+    children:
+        spines:
+            hosts:
+                spine01:
+                spine02:
+        leafs:
+            hosts:
+                leaf01:
+                leaf02:
+        border-routers:
+            hosts:
+                spine01:
+                spine02:
+                cs01:
+        access-layer:
+            hosts:
+                leaf01:
+                leaf02:
+                cs01:
+        cloud-services:
+            hosts:
+                cs01:
+        ios:
+            vars:
+                ansible_network_os: ios
+                ansible_user: admin
+                ansible_password: student
+            hosts:
+                cs01:
+        vyos:
+            vars:
+                ansible_network_os: vyos
+                ansible_user: vyos
+                ansible_password: vyos
+            children:
+                spines:
+                leafs:
+        network:
+            children:
+                vyos:
+                ios:
 
 
 
