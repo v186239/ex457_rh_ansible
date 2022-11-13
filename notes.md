@@ -45,6 +45,8 @@ https://github.com/IPvZero/CodeSamples/tree/main/Ansible/
 
 16. ----------------------- Install Ansible ----------------------------------------------------------------
 
+[root@host ~]#  sudo yum install ansible python-netaddr
+
 Sample Installation Procedure
 This is an example of how to install Red Hat Ansible Engine on a Red Hat Enterprise Linux control node.
 
@@ -171,6 +173,9 @@ ansible -m ios_system -a "hostname={{ inventory_hostname }}" cs01
 VYOS AD HOC COMMANDS
 
 Display hostname
+
+show vyos config
+ansible -m vyos_command -a "commands='sh conf com'" leaf02
 
 ansible -m vyos_command -a "commands='sh host name'" leaf02
 
@@ -4853,7 +4858,7 @@ all:
             children:
                 vyos:
                 ios:
-
+                
 
 
    
