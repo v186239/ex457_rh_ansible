@@ -1334,6 +1334,22 @@ Updated hosts inventory with R3 and R4.
 
 Let's start OSPF automation using an Ansible Playbook.
 
+The following are minimal OSPF configurations for a VyOS and an IOS device:
+
+VyOS:
+set interfaces loopback lo address 10.0.0.1/32
+set protocols ospf parameters router-id 10.0.0.1
+set protocols ospf area 0 network 10.10.1.0/24
+set protocols ospf log-adjacency-changes
+
+IOS:
+no router ospf 1
+router ospf 1
+router-id 172.16.0.1
+network 172.16.2.0 0.0.0.3 area 0
+network 172.16.5.0 0.0.0.3 area 0
+network 172.16.10.0 0.0.0.3 area 0
+
 First we will try to configure OSPF using OSPF Ansible modules with a simple configuration.
 
 Create a playbook called ospf1.yml and configure OSPF using config lines
@@ -1494,6 +1510,13 @@ With eBGP, if you want to peer with a loopback it does require a change to the T
 With iBGP, the IGP is used and peering with loopback easier if IGP protocol provides connectivity.
 
 vYOS uses something called BGP unnumbered (similar to Cumulus linux ) which uses the keyword external or internal to specify the remote peer ASN automatically under the hood.
+
+The following is a minimal configuration for EBGP on a VyOS device:
+set interfaces loopback lo address 10.0.0.1/32
+set protocols bgp 100 parameters router-id '10.0.0.1'
+set protocols bgp 100 network 10.10.1.0/24
+set protocols bgp 100 network 10.10.10.0/24
+set protocols bgp 100 neighbor 172.25.250.61 remote-as '200'
 
 --------------------- Create a BGP Topology  -----------------------------------------
 
@@ -4749,7 +4772,6 @@ OBJECTIVE:
         Create Ansible Tower Inventory: COMPLETED ###########################################
         Create Ansible Tower Job Template: COMPLETED ###########################################
         Create Ansible Tower Survey: COMPLETED ###########################################
-
 
         15 points each
         Deploy Ansible:

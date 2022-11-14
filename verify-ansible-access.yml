@@ -1,0 +1,18 @@
+---
+- name: a play that verifies access to members of host group 'all'
+  hosts: TAMPFLXY_CISCO_NEC
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+  - name: "verify access to {{ inventory_hostname }}"
+    ping:
+    register: ping_response
+
+  - name: debug
+    debug:
+      msg: "{{ ping_response }}"
+  
+  - name: assert that the response contains the string 'pong'
+    assert:
+      that: ping_response.ping == "pong"
