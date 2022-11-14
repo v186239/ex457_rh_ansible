@@ -1342,7 +1342,7 @@ set protocols ospf parameters router-id 10.0.0.1
 set protocols ospf area 0 network 10.10.1.0/24
 set protocols ospf log-adjacency-changes
 
-IOS:
+OS:
 no router ospf 1
 router ospf 1
 router-id 172.16.0.1
@@ -1480,6 +1480,31 @@ default-information originate
       debug:
         msg: "{{ arista_output.commands }}"
       when: "ansible_network_os == 'arista.eos.eos'"
+
+-----------------------OSPF IOS AND VYOS CONFIGURATION PLAYBOOK ------------------
+
+
+
+---
+- name: play that configures OSPF according to data and templates
+  hosts: network
+  vars:
+    vyos_ospf_template: j2/vyos-ospf.j2
+    ios_ospf_template: j2/ios-ospf.j2
+  vars_files:
+    - vars/consolidation-data.yml
+  tasks:
+    - name: configure ospf on vyos
+      vyos_config:
+        src: "{{ vyos_ospf_template }}"
+      save: True
+      when: ansible_network_os == 'vyos'
+    - name: configure ospf on ios
+      ios_config:
+        src: "{{ ios_ospf_template }}"
+      save_when: changed
+      when: ansible_network_os == 'ios'
+
 
 --------------------- BGP OVERVIEW -----------------------------------------
 
