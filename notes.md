@@ -24,15 +24,86 @@ https://github.com/IPvZero/CodeSamples/tree/main/Ansible/
 
 7. Basic Setup
 
+   sudo yum install git
+
+   git --version 
+
+   git config --global user.name "v86239"
+
+   git config --global user.email william.rivera@verizonwireless.com
+
+   mkdir Brandnewdirectory
+
+   To create repository
+
+   git init 
+
+   ls -la
+
+   git status
+
+   add a file and make changes
+
+   git diff filename
+
+
 8. Creating a Repository
+
+   git clone https://github.com/yoursite.git
+
+   cd to git directory
+
+   git pull
 
 9. Reading the logs
 
+   git log
+
 10. Creating a Test Branch
+
+    cd to the brand-new directory
+    
+    git init 
+
+    create a file with context and save in this brand-new directory
+    
+    git add filename
+
+    git commit -m "Comment to push a file"
+
+    git log
+
+    git status
+
+    Another way to create a branch is to use -b option with checkout command
+
+    git checkout -b dev
 
 11. Merging Branches
 
+    Switch to the branch you want to merge to
+
+    git checkout master
+
+    git merge dev
+
 12. Pushing to Remote Repositories
+      
+    git add filename
+
+    git commit -m "Comment to push a file"
+
+    To store the token in Git
+
+    First create the personal token on the Github website.
+
+    git clone https://github.com/yoursite.git
+
+    paste in the token when prompted.
+
+    git config --global credential.helper store
+
+    git push -u origin main
 
 # Configure Ansible
 
@@ -150,6 +221,14 @@ ansible-doc -t inventory ini
 ansible-doc -t connection netconf
 
 ansible-doc -t connection network_cli
+
+ansible -m ping ios
+
+ansible -m ios_command -a "commands='sh ip int br'" cs01
+
+ansible -m ping vyos
+
+ansible -m vyos_command -a "commands='sh int'" vyos
 
 ansible usa -m raw -c paramiko -a "show ip interface brief"
 
@@ -1697,6 +1776,14 @@ Example playbook:
       when: "ansible_network_os == 'arista.eos.eos'"
 
 
+BGP VALIDATION AD HOC COMMANDS
+
+ansible -m ios_command -a "commands='sh ip bgp sum'" cs01
+
+
+ansible -m vyos_command -a "commands='sh ip bgp sum'" spines
+
+
 # Configure VLANS
 
 --------------------- VLAN OVERVIEW -----------------------------------------
@@ -2927,9 +3014,80 @@ Server Logging
 
 Is the best option which offloads logging and sends it to an actual Server!  
 
+
+--------------------- Cisco Syslog Configuration using JINJA2 TEMPLATES ----------------------------------------------------------
+
+First define group_vars
+
+vi group_vars/network/vars.yml
+
+ansible_connection: network_cli
+domain_name: lab.example.com
+syslog_ipv4: 172.25.250.254
+nameservers:
+- 8.8.8.8
+- 8.8.4.4
+
+vi group_vars/vyos/vars.yml
+
+ansible_network_os: vyos
+ansible_user: vyos
+vyos_loglevel: info
+
+vi group_vars/ios/vars.yml
+
+ansible_network_os: ios
+ansible_user: admin
+ios_loglevel: 7
+
+Then create Jinja2 Templates to configure devices:
+
+vi j2/vyos-config.j2
+
+set system host-name {{ inventory_hostname }}
+set system domain-name {{ domain_name }}
+{% for nameserver in nameservers %}
+set system name-server {{ nameserver }}
+{% endfor %}
+set system syslog host {{ syslog_ipv4 }} facility local7 level {{ vyos_loglevel }}
+
+vi j2/ios-config.j2
+
+hostname {{ inventory_hostname }}
+ip domain-name {{ domain_name }}
+{% for nameserver in nameservers %}
+ip name-server {{ nameserver }}
+{% endfor %}
+service timestamps log datetime
+service timestamps debug datetime
+logging {{ syslog_ipv4 }}
+logging trap {{ ios_loglevel }}
+
+Then create ansible playbook to configure devices
+
+vi j2cfg.yml
+
+---
+- name: configure devices using j2 templates
+  hosts: network
+  vars:
+    vyos_template: j2/vyos-config.j2
+    ios_template: j2/ios-config.j2
+
+  tasks:
+    - name: configure {{ inventory_hostname }}
+      vyos_config:
+        src: "{{ vyos_template }}"
+      when: ansible_network_os == 'vyos'
+    - name: configure {{ inventory_hostname }}
+      ios_config:
+        src: "{{ ios_template }}"
+      when: ansible_network_os == 'ios'
+
+
 ----------------------------------------------------------------------------------------------
 
---------------------- Cisco Syslog Configuration using ANSIBLE----------------------------------------------------------
+--------------------- Cisco Syslog Configuration using ANSIBLE MODULES----------------------------------------------------------
 
 SYSLOG TCPDUMP command
 sudo tcpdump -Xni eth0 port 514
@@ -4860,6 +5018,7 @@ vyos
 ios
 
 # YAML inventory format
+# YAML Parser https://jsonformatter.org/yaml-parser
 ---
 all:
     vars:
